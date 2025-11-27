@@ -10,6 +10,7 @@
     if: always()
     uses: hrzlgmm/actions/.github/workflows/typos-reusable.yml@main
 ```
+
 ## Build and push docker images
 
 
