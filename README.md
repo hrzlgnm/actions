@@ -2,13 +2,13 @@
 
 ## Check spelling
 
-### Quix Start
+### Quick Start
 
 ```yml
   typos:
     name: 📝 Check typos
     if: always()
-    uses: hrzlgmm/actions/.github/workflows/typos-reusable.yml@main
+    uses: hrzlgnm/actions/.github/workflows/typos-reusable.yml@main
 ```
 
 ## Build and push docker images
