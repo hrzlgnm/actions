@@ -12,7 +12,6 @@ version-resolver:
       - "breaking-change"
   minor:
     labels:
-      - "enhancement"
       - "feature"
 
   patch:
@@ -31,7 +30,6 @@ categories:
 
   - title: ":sparkles: New Features"
     labels:
-      - "enhancement"
       - "feature"
 
   - title: ":bug: Bug Fixes"
