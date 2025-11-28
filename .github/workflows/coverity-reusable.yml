@@ -1,0 +1,51 @@
+# Copyright 2025 hrzlgnm
+# SPDX-License-Identifier: MIT-0
+
+name: "Coverity Scan Reusable"
+on:
+  workflow_call:
+    inputs:
+      coverity-email:
+        required: true
+        type: string
+      coverity-token:
+        required: true
+        type: string
+      extra-deps:
+        required: false
+        type: string
+        default: ""
+jobs:
+  coverity:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🔄 Checkout
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6
+
+      - name: 🛠️ Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -qq -y \
+            build-essential \
+            cmake \
+            curl \
+            ninja-build \
+            ${{ inputs.extra-deps }}
+
+      - name: ⚙️ Configure using CMake and Ninja
+        run: cmake -S . -B build -G Ninja
+
+      - name: ⚡Scan with Coverity
+        uses: vapier/coverity-scan-action@2068473c7bdf8c2fb984a6a40ae76ee7facd7a85 # v1.8.0
+        with:
+          email: ${{ inputs.coverity-email }}
+          token: ${{ inputs.coverity-token }}
+          command: ninja
+          working-directory: "${{ github.workspace }}/build"
+
+      - name: 📤 Upload analysis tarball
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        with:
+          name: ${{ github.event.repository.name }}_coverity_scan_upload_${{ github.sha }}
+          path: build/cov-int.tgz
+          if-no-files-found: error
