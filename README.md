@@ -35,8 +35,9 @@ jobs:
 ```yml
 jobs:
   coverity:
-    uses: hrzlgnm/actions/.github/workflows/coverity-reusable.yml@v1.2.0
+    uses: hrzlgnm/actions/.github/workflows/coverity-reusable.yml@v1.2.1
+    secrets:
+      COVERITY_EMAIL: ${{ secrets.COVERITY_EMAIL }}
+      COVERITY_TOKEN: ${{ secrets.COVERITY_TOKEN }}
     with:
-      coverity-email: ${{ secrets.COVERITY_NOTIFY_EMAIL }}
-      coverity-token: ${{ secrets.COVERITY_SCAN_TOKEN }}
       extra-deps: "libgflags-dev libmnl-dev libspdlog-dev"

@@ -4,17 +4,17 @@
 name: "Coverity Scan Reusable"
 on:
   workflow_call:
+    secrets:
+      COVERITY_EMAIL:
+        required: true
+      COVERITY_TOKEN:
+        required: true
     inputs:
-      coverity-email:
-        required: true
-        type: string
-      coverity-token:
-        required: true
-        type: string
       extra-deps:
         required: false
         type: string
         default: ""
+
 jobs:
   coverity:
     runs-on: ubuntu-latest
@@ -38,8 +38,8 @@ jobs:
       - name: ⚡Scan with Coverity
         uses: vapier/coverity-scan-action@2068473c7bdf8c2fb984a6a40ae76ee7facd7a85 # v1.8.0
         with:
-          email: ${{ inputs.coverity-email }}
-          token: ${{ inputs.coverity-token }}
+          email: ${{ secrets.COVERITY_EMAIL }}
+          token: ${{ secrets.COVERTIY_TOKEN }}
           command: ninja
           working-directory: "${{ github.workspace }}/build"
 
