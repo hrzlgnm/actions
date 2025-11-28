@@ -1,0 +1,48 @@
+name: "Coverity Scan Reusable"
+on:
+  workflow_call:
+    inputs:
+      coverity-email:
+        required: true
+        type: string
+      coverity-token:
+        required: true
+        type: string
+      extra-deps:
+        required: false
+        type: string
+        default: ""
+jobs:
+  coverity:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🔄 Checkout
+        uses: actions/checkout@v3
+
+      - name: 🛠️ Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -qq -y \
+            build-essential \
+            cmake \
+            curl \
+            ninja-build \
+            ${{ inputs.extra-deps }}
+
+      - name: ⚙️ Configure using CMake and Ninja
+        run: cmake -S . -B build -G Ninja
+
+      - name: ⚡Scan with Coverity
+        uses: vapier/coverity-scan-action@v1.8.0
+        with:
+          email: ${{ inputs.coverity-email }}
+          token: ${{ inputs.coverity-token }}
+          command: ninja
+          working-directory: "${{ github.workspace }}/build"
+
+      - name: 📤 Upload analysis tarball
+        uses: actions/upload-artifact@v5
+        with:
+          name: ${{ github.event.repository.name }}_coverity_scan_upload_${{ github.sha }}
+          path: build/cov-int.tgz
+          if-no-files-found: error
