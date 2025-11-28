@@ -41,6 +41,7 @@ jobs:
       COVERITY_TOKEN: ${{ secrets.COVERITY_TOKEN }}
     with:
       extra-deps: "libgflags-dev libmnl-dev libspdlog-dev"
+```
 
 ## Check Cmake Format using Gersemi
 
@@ -51,5 +52,4 @@ jobs:
   gersemi:
     name: Check CMake format
     uses: hrzlgnm/actions/.github/workflows/gersemi-reusable.yml@v1.3.0
-```
 ```
