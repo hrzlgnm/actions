@@ -1,0 +1,69 @@
+change-template: "- $TITLE @$AUTHOR #$NUMBER"
+sort-direction: ascending
+
+name-template: "Release v$RESOLVED_VERSION"
+tag-template: "v$RESOLVED_VERSION"
+tag-prefix: v
+
+version-resolver:
+  major:
+    labels:
+      - "major"
+      - "breaking-change"
+  minor:
+    labels:
+      - "enhancement"
+      - "feature"
+
+  patch:
+    labels:
+      - "patch"
+      - "bug"
+      - "bugfix"
+      - "dependencies"
+
+  default: patch
+
+category-template: "### $TITLE"
+categories:
+  - title: ":boom: Breaking Changes"
+    label: "breaking-change"
+
+  - title: ":sparkles: New Features"
+    labels:
+      - "enhancement"
+      - "feature"
+
+  - title: ":bug: Bug Fixes"
+    labels:
+      - "bug"
+      - "bugfix"
+
+  - title: "🧰 Maintenance"
+    label: "chore"
+
+  - title: ":recycle: Refactor"
+    label: "refactor"
+
+  - title: ":scroll: Documentation"
+    label: "documentation"
+
+  - title: ":arrow_up: Dependency Updates"
+    label: "dependencies"
+    collapse-after: 10
+
+exclude-labels:
+  - ignore
+
+header: |
+
+  ## What's Changed
+
+template: |
+
+  $CHANGES
+
+footer: |
+
+  ### Full Changelog
+  [$PREVIOUS_TAG...v$RESOLVED_VERSION](https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...v$RESOLVED_VERSION)

@@ -5,12 +5,26 @@ name: CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
   pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
+  label-pr:
+    if: github.event_name == 'pull_request'
+    name: "🏷️ PR"
+    permissions:
+      contents: read # for TimonVS/pr-labeler-action to read config file
+      pull-requests: write # for TimonVS/pr-labeler-action to add labels in PR
+    runs-on: ubuntu-slim
+    steps:
+      - uses: TimonVS/pr-labeler-action@f9c084306ce8b3f488a8f3ee1ccedc6da131d1af # v5
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
   typos:
     uses: ./.github/workflows/typos-reusable.yml
 
@@ -18,10 +32,13 @@ jobs:
     name: CI Status
     runs-on: ubuntu-latest
     needs:
+      - label-pr
       - typos
     if: always()
     steps:
       - name: Check whether the needed jobs succeeded or failed
         uses: re-actors/alls-green@2765efec08f0fd63e83ad900f5fd75646be69ff6
         with:
+          allowed-skips: >-
+            label-pr
           jobs: ${{ toJSON(needs) }}
