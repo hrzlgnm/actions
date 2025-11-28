@@ -4,7 +4,8 @@ on:
   workflow_call:
 
 jobs:
-  cmake-format:
+  gersemi-cmake-check:
+    name: 📐 CMake
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/hrzlgnm/actions-github-gersemi:v1@sha256:2539da6bbd1f2b372b5a084afc1b95510d119d7d8f5c04e4a106e94291f5c334
