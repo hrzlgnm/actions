@@ -11,8 +11,47 @@ on:
     branches:
       - main
   workflow_dispatch:
+  # measure against bitrot
+  # also rotates docker images monthly, by pushing new docker images
+  # the rotation will happen by renovate
+  schedule:
+    - cron: "0 0 1 * *"
+
+env:
+  BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+
+concurrency:
+  # On main, we want all builds to complete even if merging happens faster to make it easier to discover at which point something broke.
+  group: ${{ github.ref == 'refs/heads/main' && format('ci-main-{0}', github.sha) || format('ci-{0}', github.ref) }}
+  cancel-in-progress: true
 
 jobs:
+  changes:
+    name: "🔍 Detect Changes"
+    runs-on: ubuntu-slim
+    outputs:
+      branch: ${{ steps.branch.outputs.branch }}
+      docker: ${{ steps.filter.outputs.docker }}
+      workflows: ${{ steps.filter.outputs.lint }}
+    steps:
+      - name: 🔄 Checkout
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6
+
+      - name: 🔍 Check for changes
+        uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
+        id: filter
+        with:
+          filters: |
+            docker:
+              - '.github/docker/**'
+            workflows:
+              - '.github/workflows/*.yml'
+
+      - name: Output branch name
+        id: branch
+        run: |
+          echo "branch=${{ env.BRANCH_NAME }}" >> $GITHUB_OUTPUT
+
   label-pr:
     if: github.event_name == 'pull_request'
     name: "🏷️ PR"
@@ -28,11 +67,23 @@ jobs:
   typos:
     uses: ./.github/workflows/typos-reusable.yml
 
+  docker:
+    name: "🐳"
+    needs: changes
+    if: needs.changes.outputs.docker == 'true'
+    permissions:
+      contents: read
+      packages: write # Needed to push to GHCR
+    uses: ./.github/workflows/docker-reusable.yml
+    with:
+      branch: ${{ needs.changes.outputs.branch }}
+
   all-required-green: # This job does nothing and is only used for the branch protection
     name: CI Status
     runs-on: ubuntu-latest
     needs:
       - label-pr
+      - docker
       - typos
     if: always()
     steps:
@@ -40,5 +91,6 @@ jobs:
         uses: re-actors/alls-green@2765efec08f0fd63e83ad900f5fd75646be69ff6
         with:
           allowed-skips: >-
-            label-pr
+            label-pr,
+            docker
           jobs: ${{ toJSON(needs) }}
