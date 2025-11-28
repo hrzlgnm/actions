@@ -39,7 +39,7 @@ jobs:
         uses: vapier/coverity-scan-action@2068473c7bdf8c2fb984a6a40ae76ee7facd7a85 # v1.8.0
         with:
           email: ${{ secrets.COVERITY_EMAIL }}
-          token: ${{ secrets.COVERTIY_TOKEN }}
+          token: ${{ secrets.COVERITY_TOKEN }}
           command: ninja
           working-directory: "${{ github.workspace }}/build"
 
