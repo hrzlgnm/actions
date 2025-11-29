@@ -29,7 +29,7 @@ jobs:
           list-files: json
           filters: |
             dockerfiles:
-              - '.github/docker/*/Dockerfile'
+              - added|modified: '.github/docker/*/Dockerfile'
 
       - name: 🧩 Extract package names
         id: packages
@@ -37,13 +37,7 @@ jobs:
           paths='${{ steps.filter.outputs.dockerfiles_files }}'
 
           names=$(echo "$paths" \
-            | jq -r '.[]' \
-            | while read path; do
-                # Only keep if the Dockerfile exists, so removed ones are not built
-                if [ -f "$path" ]; then
-                  echo "$path" | awk -F'/' '{print $3}'
-                fi
-              done \
+            | jq -r '.[] | split("/") | .[2]' \
             | jq -R -s -c 'split("\n")[:-1]')
 
           echo "packages=$names" >> $GITHUB_OUTPUT
