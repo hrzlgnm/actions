@@ -53,3 +53,16 @@ jobs:
     name: Check CMake format
     uses: hrzlgnm/actions/.github/workflows/gersemi-reusable.yml@v1.3.0
 ```
+
+## Check code format using Clang-Format
+
+
+### Quick Start
+
+```yml
+jobs:
+  clang-format:
+    name: Check code format
+    uses: hrzlgnm/actions/.github/workflows/clang-format-reusable.yml@v1.4.0
+```
+
