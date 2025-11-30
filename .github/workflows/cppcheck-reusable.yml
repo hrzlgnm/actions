@@ -22,7 +22,6 @@ jobs:
           -B ../build
 
       - name: 📘🔍Cppcheck
-        if: always()
         run: |
           echo "Checking with $(cppcheck --version)"
           cppcheck \
