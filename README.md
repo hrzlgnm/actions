@@ -66,3 +66,13 @@ jobs:
     uses: hrzlgnm/actions/.github/workflows/clang-format-reusable.yml@v1.4.0
 ```
 
+## Statically analyze code with cppcheck
+
+### Quick Start
+
+```yml
+jobs:
+  cppcheck:
+    name: Run cppcheck
+    uses: hrzlgnm/actions/.github/workflows/cppcheck-reusable.yml@v1.5.0
+
