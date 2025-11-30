@@ -4,6 +4,7 @@ RUN xbps-install -Syu xbps \
     && xbps-install -Sy \
     bash \
     clang-tools-extra \
+    git \
     && xbps-remove -Ooy
 
 LABEL org.opencontainers.image.source="https://github.com/hrzlgnm/actions"
