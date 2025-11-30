@@ -1,0 +1,18 @@
+name: Reusable clang-format check workflow
+
+on:
+  workflow_call:
+
+jobs:
+  clang-format:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/hrzlgnm/actions-github-clang-format:v1@sha256:f474ca6661d370fb4e4e0889f5b83d4ab2657ad6844a9f05ddd9148837d8ea51 # v1
+    steps:
+      - name: 🔄 Checkout
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6
+
+      - name: 📐 Check clang-format
+        shell: bash
+        run: |
+          find . -regex '.*\.\(cpp\|hpp\)' -exec clang-format --dry-run --Werror {} +
