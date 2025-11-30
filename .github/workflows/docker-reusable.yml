@@ -72,8 +72,7 @@ jobs:
         with:
           context: .github/docker/${{ matrix.package }}
           file: .github/docker/${{ matrix.package }}/Dockerfile
-
           push: true
           tags: |
             ghcr.io/${{ github.repository_owner }}/${{ matrix.package }}:${{ inputs.branch == 'main' && 'v1' || 'dev' }}
-            ${{ inputs.branch == 'main' && format('ghcr.io/{0}/{1}:latest', github.repository_owner, matrix.package) || '' }}
+            ghcr.io/${{ github.repository_owner }}/${{ matrix.package }}:latest
