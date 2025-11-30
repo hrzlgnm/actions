@@ -60,22 +60,19 @@ jobs:
       - name: 🔄 Checkout
         uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6
 
-      - name: 🔐 Login to GHCR (main only)
-        if: inputs.branch == 'main'
+      - name: 🔐 Login to GHCR
         uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # v3.6.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 🔧 Build image (and 🚀 push on main)
+      - name: 🔧 Build and 🚀 push image
         uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
         with:
           context: .github/docker/${{ matrix.package }}
           file: .github/docker/${{ matrix.package }}/Dockerfile
-
-          push: ${{ inputs.branch == 'main' }}
-
+          push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/${{ matrix.package }}:v1
-            ghcr.io/${{ github.repository_owner }}/${{ matrix.package }}:latest
+            ghcr.io/${{ github.repository_owner }}/${{ matrix.package }}:${{ inputs.branch == 'main' && 'v1' || 'dev' }}
+            ${{ inputs.branch == 'main' && format('ghcr.io/{0}/{1}:latest', github.repository_owner, matrix.package) }}
