@@ -1,0 +1,34 @@
+name: "Reusable cppcheck workflow"
+
+on:
+  workflow_call:
+
+jobs:
+  cppcheck:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/hrzlgnm/actions-github-cppcheck:v1
+
+    steps:
+      - name: 🔄 Checkout
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6
+
+      - name: ⚙️ Configure
+        run: >-
+          cmake
+          -GNinja
+          -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          -S .
+          -B ../build
+
+      - name: 📘🔍Cppcheck
+        run: |
+          echo "Checking with $(cppcheck --version)"
+          cppcheck \
+          --inline-suppr \
+          --check-level=exhaustive \
+          --project=../build/compile_commands.json \
+          --library=cppcheck/${{ github.event.repository.name }}.cfg \
+          --enable=style \
+          --suppress='*:fmt/*' \
+          --error-exitcode=2
