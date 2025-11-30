@@ -4,6 +4,7 @@ RUN xbps-install -Syu xbps \
     && xbps-install -Sy \
     bash \
     clang-tools-extra \
+    findutils \
     git \
     && xbps-remove -Ooy
 
