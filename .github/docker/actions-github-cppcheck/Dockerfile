@@ -15,5 +15,5 @@ RUN xbps-install -Syu xbps \
     && xbps-remove -Ooy
 
 LABEL org.opencontainers.image.source="https://github.com/hrzlgnm/actions"
-LABEL org.opencontainers.image.title="actions GitHub cppcehck"
+LABEL org.opencontainers.image.title="actions GitHub cppcheck"
 LABEL org.opencontainers.image.base.name="ghcr.io/void-linux/void-glibc"
