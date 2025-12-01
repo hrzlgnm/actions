@@ -14,8 +14,11 @@ on:
   # measure against bitrot
   # also rotates docker images monthly, by pushing new docker images
   # the rotation will happen by renovate
+  # rotate the images at the end of the 3th quarter of the month, 
+  # to avoid duplicate rotations at the beginning/middle of the month, 
+  # as the source docker images are also mostly rotated once a month
   schedule:
-    - cron: "0 0 1 * *"
+    - cron: "0 0 21 * *"
 
 env:
   BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
