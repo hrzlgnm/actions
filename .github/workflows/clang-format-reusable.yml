@@ -10,7 +10,7 @@ jobs:
       image: ghcr.io/hrzlgnm/actions-github-clang-format:v1@sha256:eb24f6a3977757f8043a1903da228007231d7dbe4b76d763bb584dd86816b39d # v1
     steps:
       - name: 🔄 Checkout
-        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
 
       - name: 📐 Check clang-format
         shell: bash
