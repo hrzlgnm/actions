@@ -1,5 +1,5 @@
 FROM python:3.14-slim@sha256:f7864aa85847985ba72d2dcbcbafd7475354c848e1abbdf84f523a100800ae0b AS build
-RUN pip install --root-user-action=ignore --no-cache-dir gersemi==0.24.0
+RUN pip install --root-user-action=ignore --no-cache-dir gersemi==0.25.0
 
 FROM python:3.14-slim@sha256:f7864aa85847985ba72d2dcbcbafd7475354c848e1abbdf84f523a100800ae0b
 COPY --from=build /usr/local/bin/gersemi /usr/local/bin/
