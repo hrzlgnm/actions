@@ -25,10 +25,15 @@ jobs:
         run: |
           echo "Checking with $(cppcheck --version)"
           cppcheck \
-          --inline-suppr \
           --check-level=exhaustive \
           --project=../build/compile_commands.json \
           --library=cppcheck/${{ github.event.repository.name }}.cfg \
-          --enable=style \
+          --enable=style,performance,warning,portability \
+          --inline-suppr \
+          --suppress=cppcheckError \
+          --suppress=internalAstError \
+          --suppress=unmatchedSuppression \
+          --suppress=syntaxError \
+          --suppress=preprocessorErrorDirective \
           --suppress='*:fmt/*' \
           --error-exitcode=2
