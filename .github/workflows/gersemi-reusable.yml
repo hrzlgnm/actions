@@ -8,7 +8,7 @@ jobs:
     name: 📐 CMake
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/hrzlgnm/actions-github-gersemi:v1@sha256:308fa4a6894a3e0b22903d48c1ef65e68964882c88e07ddb585574b16dac5fe8
+      image: ghcr.io/hrzlgnm/actions-github-gersemi:v1@sha256:949d69ceeccbde2c80df7d9f249272de77ee103554ca99d9301f1a5a1e5b2d40
     steps:
       - name: 🔄 Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
