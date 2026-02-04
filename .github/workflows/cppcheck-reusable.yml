@@ -7,7 +7,7 @@ jobs:
   cppcheck:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/hrzlgnm/actions-github-cppcheck:v1@sha256:66eecf51709720dd3c37bc2dd94719ebc45bbca759be32cd9bc64c279f9b8818
+      image: ghcr.io/hrzlgnm/actions-github-cppcheck:v1@sha256:0195feab3acd7cce1881a7b4a4f238d96e49943b2a368b432aad99114b113f29
 
     steps:
       - name: 🔄 Checkout
