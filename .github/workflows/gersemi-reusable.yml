@@ -11,7 +11,7 @@ jobs:
       image: ghcr.io/hrzlgnm/actions-github-gersemi:v1@sha256:308fa4a6894a3e0b22903d48c1ef65e68964882c88e07ddb585574b16dac5fe8
     steps:
       - name: 🔄 Checkout
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
       - name: 📐 Check cmake format
         run: gersemi --check --diff .
