@@ -7,7 +7,7 @@ jobs:
   clang-format:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/hrzlgnm/actions-github-clang-format:v1@sha256:6b6a0176a62edcc75152fc3dab0e617ba68a7d5a7612bfbf7a116770ffc91a30 # v1
+      image: ghcr.io/hrzlgnm/actions-github-clang-format:v1@sha256:99a7d75dd5d2d39224f51477d896654032869af8d7f7aee887376d26c124c560 # v1
     steps:
       - name: 🔄 Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
