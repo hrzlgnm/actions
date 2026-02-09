@@ -93,7 +93,7 @@ jobs:
     if: always()
     steps:
       - name: Check whether the needed jobs succeeded or failed
-        uses: re-actors/alls-green@1f19edaf0fb31ef7772d8a230cc5fa1e755d8022
+        uses: re-actors/alls-green@a638d6464689bbb24c325bb3fe9404d63a913030
         with:
           allowed-skips: >-
             label-pr,
