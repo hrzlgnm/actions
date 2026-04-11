@@ -69,6 +69,9 @@ jobs:
   typos:
     uses: ./.github/workflows/typos-reusable.yml
 
+  actionlint:
+    uses: ./.github/workflows/actionlint-reusable.yml
+
   all-required-green: # This job does nothing and is only used for the branch protection
     name: CI Status
     runs-on: ubuntu-latest

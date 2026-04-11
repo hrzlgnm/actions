@@ -28,4 +28,16 @@ jobs:
       branch: ${{ inputs.branch }}
 ```
 
+## Lint GitHub actions
+
+### Quick Start
+
+```yml
+jobs:
+  actionlint:
+    permissions:
+      contents: read
+
+    uses: hrzlgnm/actions/.github/workflows/actionlint-reusable.yml@v2.1.0
+```
 
