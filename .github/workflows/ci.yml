@@ -50,7 +50,7 @@ jobs:
       - name: Output branch name
         id: branch
         run: |
-          echo "branch=${{ env.BRANCH_NAME }}" >> $GITHUB_OUTPUT
+          echo "branch=${{ env.BRANCH_NAME }}" >> "$GITHUB_OUTPUT"
 
   label-pr:
     if: github.event_name == 'pull_request'
