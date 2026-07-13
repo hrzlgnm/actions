@@ -41,3 +41,20 @@ jobs:
     uses: hrzlgnm/actions/.github/workflows/actionlint-reusable.yml@v2.1.0
 ```
 
+## Retry failed CI runs
+
+### Quick Start
+
+```yml
+jobs:
+  retry-failed:
+    permissions:
+      actions: write
+      contents: read
+
+    uses: hrzlgnm/actions/.github/workflows/retry-failed-ci-reusable.yml@v2.2.0
+    with:
+      workflow: ci.yml
+      hours: 24
+```
+
