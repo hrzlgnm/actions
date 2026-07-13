@@ -66,7 +66,8 @@ jobs:
           while IFS=' ' read -r RUN_ID HEAD_BRANCH RUN_NUMBER _CREATED_AT; do
             [ -z "$RUN_ID" ] && continue
 
-            EXISTING_RERUN=$(HEAD_BRANCH="$HEAD_BRANCH" RUN_NUMBER="$RUN_NUMBER" gh api \
+            # shellcheck disable=SC2016,SC2097,SC2098
+          EXISTING_RERUN=$(HEAD_BRANCH="$HEAD_BRANCH" RUN_NUMBER="$RUN_NUMBER" gh api \
               --method GET \
               -f head="$HEAD_BRANCH" \
               -q 'env as $env | .workflow_runs[] | select(.head_branch == $env.HEAD_BRANCH and .run_number > ($env.RUN_NUMBER | tonumber)) | .id' \
