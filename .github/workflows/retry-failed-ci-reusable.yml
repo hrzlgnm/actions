@@ -1,0 +1,97 @@
+# Copyright 2026 hrzlgnm
+# SPDX-License-Identifier: MIT-0
+
+name: "Retry Failed CI Reusable"
+
+on:
+  workflow_call:
+    inputs:
+      workflow:
+        type: string
+        description: "The workflow filename to search for failed runs (e.g., 'ci.yml')"
+        required: true
+      hours:
+        type: number
+        description: "Number of hours to look back for failed runs"
+        default: 24
+  workflow_dispatch:
+
+concurrency:
+  group: retry-failed-ci-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  retry-failed:
+    name: 🔄 Retry failed CI runs
+    runs-on: ubuntu-slim
+    permissions:
+      actions: write
+      contents: read
+    steps:
+      - name: 🔍 Find and retry failed CI runs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          WORKFLOW="${{ inputs.workflow || 'ci.yml' }}"
+          HOURS="${{ inputs.hours || 24 }}"
+
+          echo "Searching for failed $WORKFLOW runs from the last $HOURS hours..."
+
+          SINCE=$(date -u -d "$HOURS hours ago" '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || \
+                  date -u -v-"${HOURS}"H '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || \
+                  date -u '+%Y-%m-%dT%H:%M:%SZ')
+          echo "Looking for runs since: $SINCE"
+
+          FAILED_RUNS=$(gh api \
+            --method GET \
+            -f workflow="$WORKFLOW" \
+            -f status=failure \
+            -f event=pull_request \
+            -f created=">=$SINCE" \
+            -q '.workflow_runs[] | "\(.id) \(.head_branch) \(.run_number) \(.created_at)"' \
+            "repos/{owner}/{repo}/actions/workflows/$WORKFLOW/runs")
+
+          if [ -z "$FAILED_RUNS" ]; then
+            echo "No failed $WORKFLOW runs found in the last $HOURS hours. Nothing to retry."
+            exit 0
+          fi
+
+          RETRIED=0
+          SKIPPED=0
+          FAILED=0
+
+          while IFS=' ' read -r RUN_ID HEAD_BRANCH RUN_NUMBER _CREATED_AT; do
+            [ -z "$RUN_ID" ] && continue
+
+            EXISTING_RERUN=$(HEAD_BRANCH="$HEAD_BRANCH" RUN_NUMBER="$RUN_NUMBER" gh api \
+              --method GET \
+              -f head="$HEAD_BRANCH" \
+              -q 'env as $env | .workflow_runs[] | select(.head_branch == $env.HEAD_BRANCH and .run_number > ($env.RUN_NUMBER | tonumber)) | .id' \
+              "repos/{owner}/{repo}/actions/workflows/$WORKFLOW/runs" | head -1 || true)
+
+            if [ -n "$EXISTING_RERUN" ]; then
+              echo "Skipping run #$RUN_NUMBER on branch $HEAD_BRANCH — already has a newer run ($EXISTING_RERUN)"
+              SKIPPED=$((SKIPPED + 1))
+              continue
+            fi
+
+            echo "Retrying $WORKFLOW run #$RUN_NUMBER on branch $HEAD_BRANCH (run_id=$RUN_ID)..."
+
+            if gh api \
+              --method POST \
+              -f run_id="$RUN_ID" \
+              "repos/{owner}/{repo}/actions/runs/$RUN_ID/rerun-failed-jobs"; then
+              echo "  ✅ Successfully retried run #$RUN_NUMBER"
+              RETRIED=$((RETRIED + 1))
+            else
+              echo "  ❌ Failed to retry run #$RUN_NUMBER"
+              FAILED=$((FAILED + 1))
+            fi
+
+          done <<< "$FAILED_RUNS"
+
+          echo ""
+          echo "Summary: retried=$RETRIED skipped=$SKIPPED failed=$FAILED"
