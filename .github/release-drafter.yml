@@ -5,53 +5,72 @@ name-template: "Release v$RESOLVED_VERSION"
 tag-template: "v$RESOLVED_VERSION"
 tag-prefix: v
 
-version-resolver:
-  major:
-    labels:
-      - "major"
-      - "breaking-change"
-  minor:
-    labels:
-      - "feature"
-
-  patch:
-    labels:
-      - "patch"
-      - "bug"
-      - "bugfix"
-      - "dependencies"
-
-  default: patch
-
 category-template: "### $TITLE"
 categories:
+  - type: "version-resolver"
+    when:
+      labels:
+        - "major"
+        - "breaking-change"
+    semver-increment: "major"
+
+  - type: "version-resolver"
+    when:
+      labels:
+        - "feature"
+    semver-increment: "minor"
+
+  - type: "version-resolver"
+    default: true
+    when:
+      labels:
+        - "patch"
+        - "bug"
+        - "bugfix"
+        - "dependencies"
+    semver-increment: "patch"
+
   - title: ":boom: Breaking Changes"
-    label: "breaking-change"
+    when:
+      labels:
+        - "breaking-change"
 
   - title: ":sparkles: New Features"
-    labels:
-      - "feature"
+    when:
+      labels:
+        - "feature"
 
   - title: ":bug: Bug Fixes"
-    labels:
-      - "bug"
-      - "bugfix"
+    when:
+      labels:
+        - "bug"
+        - "bugfix"
 
   - title: "🧰 Maintenance"
-    label: "chore"
+    when:
+      labels:
+        - "chore"
 
   - title: ":recycle: Refactor"
-    label: "refactor"
+    when:
+      labels:
+        - "refactor"
 
   - title: ":scroll: Documentation"
-    label: "documentation"
+    when:
+      labels:
+        - "documentation"
 
   - title: ":arrow_up: Dependency Updates"
-    label: "dependencies"
+    when:
+      labels:
+        - "dependencies"
     collapse-after: 10
 
-exclude-labels:
-  - ignore
+  - type: "pre-exclude"
+    when:
+      labels:
+        - "ignore"
 
 header: |
 
