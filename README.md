@@ -56,5 +56,6 @@ jobs:
     with:
       workflow: ci.yml
       hours: 24
+      events: "pull_request,push"
 ```
 
