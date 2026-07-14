@@ -14,6 +14,10 @@ on:
         type: number
         description: "Number of hours to look back for failed runs"
         default: 24
+      events:
+        type: string
+        description: "Comma-separated list of event types to search (e.g., 'pull_request,push')"
+        default: "pull_request,push"
   workflow_dispatch:
 
 concurrency:
@@ -37,6 +41,7 @@ jobs:
 
           WORKFLOW="${{ inputs.workflow || 'ci.yml' }}"
           HOURS="${{ inputs.hours || 24 }}"
+          EVENTS="${{ inputs.events || 'pull_request,push' }}"
 
           echo "Searching for failed $WORKFLOW runs from the last $HOURS hours..."
 
@@ -45,14 +50,24 @@ jobs:
                   date -u '+%Y-%m-%dT%H:%M:%SZ')
           echo "Looking for runs since: $SINCE"
 
-          FAILED_RUNS=$(gh api \
-            --method GET \
-            -f workflow="$WORKFLOW" \
-            -f status=failure \
-            -f event=pull_request \
-            -f created=">=$SINCE" \
-            -q '.workflow_runs[] | "\(.id) \(.head_branch) \(.run_number) \(.created_at)"' \
-            "repos/{owner}/{repo}/actions/workflows/$WORKFLOW/runs")
+          FAILED_RUNS=""
+          IFS=',' read -ra EVENT_ARRAY <<< "$EVENTS"
+          for EVENT in "${EVENT_ARRAY[@]}"; do
+            EVENT=$(echo "$EVENT" | xargs)  # trim whitespace
+            echo "Checking event type: $EVENT"
+            EVENT_RUNS=$(gh api \
+              --method GET \
+              -f workflow="$WORKFLOW" \
+              -f status=failure \
+              -f event="$EVENT" \
+              -f created=">=$SINCE" \
+              -q '.workflow_runs[] | "\(.id) \(.head_branch) \(.run_number) \(.created_at)"' \
+              "repos/{owner}/{repo}/actions/workflows/$WORKFLOW/runs" || true)
+            if [ -n "$EVENT_RUNS" ]; then
+              FAILED_RUNS="${FAILED_RUNS}${EVENT_RUNS}"$'\n'
+            fi
+          done
+          FAILED_RUNS=$(echo "$FAILED_RUNS" | sed '/^$/d')
 
           if [ -z "$FAILED_RUNS" ]; then
             echo "No failed $WORKFLOW runs found in the last $HOURS hours. Nothing to retry."
