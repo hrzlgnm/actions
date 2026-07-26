@@ -1,0 +1,76 @@
+[changelog]
+header = """
+# Changelog\n
+All notable changes to this project will be documented in this file.\n
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).\n
+"""
+body = """
+{% if version -%}\
+    ## [{{ version | trim_start_matches(pat="v") }}] - {{ timestamp | date(format="%Y-%m-%d") }} {%- if previous and previous.version %} [compare](https://github.com/hrzlgnm/actions/compare/{{ previous.version }}...{{ version }}){% endif %}\n
+{% else -%}\
+    ## [Unreleased] {%- if commits and previous and previous.version %} [compare](https://github.com/hrzlgnm/actions/compare/{{ previous.version }}...HEAD){% endif %}\n
+{% endif -%}\
+{% for group, commits in commits | group_by(attribute="group") %}\
+    {% if group == "Added" -%}\
+        ### Added\n
+    {% elif group == "Fixed" -%}\
+        ### Fixed\n
+    {% elif group == "Changed" -%}\
+        ### Changed\n
+    {% elif group == "Security" -%}\
+        ### Security\n
+    {% elif group == "Miscellaneous" -%}\
+        ### Miscellaneous\n
+    {% endif -%}\
+    {% for commit in commits -%}\
+        - {% if commit.scope %}*({{ commit.scope }})* {% endif -%}\
+            {{ commit.message | upper_first | trim }}\
+            {% for link in commit.links %} ([{{ link.text }}]({{ link.href }})){% endfor %}\n
+    {% endfor -%}\
+{% endfor %}\
+"""
+trim = true
+footer = ""
+postprocessors = [
+    { pattern = 'Simlify', replace = 'Simplify' },
+    { pattern = 'hanlding', replace = 'handling' },
+    { pattern = 'verision', replace = 'version' },
+    { pattern = 'compileable', replace = 'compilable' },
+    { pattern = 'thouroughly', replace = 'thoroughly' },
+]
+
+[git]
+conventional_commits = true
+filter_unconventional = true
+split_commits = false
+commit_parsers = [
+    { message = "^feat", group = "Added" },
+    { message = "^fix", group = "Fixed" },
+    { message = "^doc", group = "Changed" },
+    { message = "^perf", group = "Changed" },
+    { message = "^refactor", group = "Changed" },
+    { message = "^style", group = "Changed" },
+    { message = "^test", group = "Changed" },
+    { message = "^ci", group = "Miscellaneous" },
+    { message = "^build", group = "Miscellaneous" },
+    { message = "^chore\\(deps\\)", skip = true },
+    { message = "^chore\\(renovate", skip = true },
+    { message = "^chore: update unreleased changelog", skip = true },
+    { message = "^chore", group = "Changed" },
+    { message = "^security", group = "Security" },
+    { message = "^GHSA-", group = "Security" },
+    { message = "^Bump version", skip = true },
+]
+protect_breaking_commits = true
+filter_commits = true
+tag_pattern = "v[0-9].*"
+skip_tags = ""
+ignore_tags = ""
+topo_order = false
+sort_commits = "oldest"
+link_parsers = [
+    { pattern = "#(\\d+)", text = "#${1}", href = "https://github.com/hrzlgnm/actions/pull/${1}" },
+]
+include_paths = []
+exclude_paths = []
