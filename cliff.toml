@@ -32,13 +32,7 @@ body = """
 """
 trim = true
 footer = ""
-postprocessors = [
-    { pattern = 'Simlify', replace = 'Simplify' },
-    { pattern = 'hanlding', replace = 'handling' },
-    { pattern = 'verision', replace = 'version' },
-    { pattern = 'compileable', replace = 'compilable' },
-    { pattern = 'thouroughly', replace = 'thoroughly' },
-]
+postprocessors = []
 
 [git]
 conventional_commits = true
