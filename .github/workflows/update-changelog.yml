@@ -27,7 +27,7 @@ jobs:
           fetch-depth: 0
 
       - name: ⚙️ Install Rust
-        uses: dtolnay/rust-toolchain@00b86db6e1305cef653c3d9289401e8e43e8e0eb # stable
+        uses: dtolnay/rust-toolchain@4cda84d5c5c54efe2404f9d843567869ab1699d4 # stable
 
       - name: 🔧 Install git-cliff
         uses: baptiste0928/cargo-install@f204293d9709061b7bc1756fec3ec4e2cd57dec0 # v3
