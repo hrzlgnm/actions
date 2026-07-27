@@ -9,15 +9,29 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: ruleset-modification
+  cancel-in-progress: false
+
 jobs:
   release:
     name: "🚀 Release"
     runs-on: ubuntu-slim
+    env:
+      GH_TOKEN: ${{ secrets.GH_ADMIN_TOKEN }}
+      RULESET: repos/${{ github.repository }}/rulesets/${{ secrets.RULESET_ID }}
     steps:
+      - name: 🛡️ Verify RULESET_ID secret is configured
+        run: |
+          if [ -z "${{ secrets.RULESET_ID }}" ]; then
+            echo "Error: secrets.RULESET_ID is not set. Please configure the RULESET_ID secret in repository settings."
+            echo "This secret should contain the ID of the ruleset used to disable enforcement during version bump."
+            exit 1
+          fi
+          echo "RULESET_ID secret is configured"
+
       - name: 📋 Get draft release version
         id: draft
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           TAG=$(gh release list --draft --json tagName --jq '.[0].tagName')
           if [ -z "$TAG" ]; then
@@ -67,10 +81,15 @@ jobs:
           git commit -S -m "chore(version): update changelog for $TAG"
 
       - name: 🔓 Disable branch protection
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RULESET_ID: ${{ secrets.RULESET_ID }}
-        run: gh api "repos/{owner}/{repo}/rulesets/$RULESET_ID" -X PUT -f enforcement="disabled"
+        run: |
+          gh api \
+          -H "Accept: application/vnd.github+json" \
+          "${RULESET}" | jq '.enforcement = "disabled"' | \
+          gh api \
+          --method PUT \
+          -H "Accept: application/vnd.github+json" \
+          "${RULESET}" \
+          --input -
 
       - name: 📤 Push to main
         env:
@@ -81,10 +100,15 @@ jobs:
 
       - name: 🔒 Re-enable branch protection
         if: always()
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RULESET_ID: ${{ secrets.RULESET_ID }}
-        run: gh api "repos/{owner}/{repo}/rulesets/$RULESET_ID" -X PUT -f enforcement="active"
+        run: |
+          gh api \
+          -H "Accept: application/vnd.github+json" \
+          "${RULESET}" | jq '.enforcement = "active"' | \
+          gh api \
+          --method PUT \
+          -H "Accept: application/vnd.github+json" \
+          "${RULESET}" \
+          --input -
 
       - name: 🏷️ Create tag
         env:
