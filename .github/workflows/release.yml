@@ -69,7 +69,8 @@ jobs:
       - name: 🔓 Disable branch protection
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh api "repos/{owner}/{repo}/rulesets/10506365" -X PUT -f enforcement="disabled"
+          RULESET_ID: ${{ secrets.RULESET_ID }}
+        run: gh api "repos/{owner}/{repo}/rulesets/$RULESET_ID" -X PUT -f enforcement="disabled"
 
       - name: 📤 Push to main
         env:
@@ -82,7 +83,8 @@ jobs:
         if: always()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh api "repos/{owner}/{repo}/rulesets/10506365" -X PUT -f enforcement="active"
+          RULESET_ID: ${{ secrets.RULESET_ID }}
+        run: gh api "repos/{owner}/{repo}/rulesets/$RULESET_ID" -X PUT -f enforcement="active"
 
       - name: 🏷️ Create tag
         env:
