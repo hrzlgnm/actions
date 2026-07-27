@@ -39,8 +39,8 @@ jobs:
         run: |
           echo "Checking for running release-drafter workflows..."
           while true; do
-            RUNNING=$(gh api "repos/${{ github.repository }}/actions/workflows/release-drafter.yml/runs" \
-              --jq '.workflow_runs[] | select(.status == "in_progress" or .status == "queued") | .id' 2>/dev/null | wc -l)
+            RUNNING=$(gh api --paginate "repos/${{ github.repository }}/actions/workflows/release-drafter.yml/runs" \
+              --jq '.workflow_runs[] | select(.status == "requested" or .status == "waiting" or .status == "pending" or .status == "queued" or .status == "in_progress") | .id' 2>/dev/null | wc -l)
             if [ "$RUNNING" -eq 0 ]; then
               echo "No release-drafter workflows running"
               break
@@ -53,8 +53,8 @@ jobs:
         run: |
           echo "Checking for running update-changelog workflows..."
           while true; do
-            RUNNING=$(gh api "repos/${{ github.repository }}/actions/workflows/update-changelog.yml/runs" \
-              --jq '.workflow_runs[] | select(.status == "in_progress" or .status == "queued") | .id' 2>/dev/null | wc -l)
+            RUNNING=$(gh api --paginate "repos/${{ github.repository }}/actions/workflows/update-changelog.yml/runs" \
+              --jq '.workflow_runs[] | select(.status == "requested" or .status == "waiting" or .status == "pending" or .status == "queued" or .status == "in_progress") | .id' 2>/dev/null | wc -l)
             if [ "$RUNNING" -eq 0 ]; then
               echo "No update-changelog workflows running"
               break
