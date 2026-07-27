@@ -1,0 +1,97 @@
+# Copyright 2026 hrzlgnm
+# SPDX-License-Identifier: MIT-0
+
+name: "🚀 Release"
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: "🚀 Release"
+    runs-on: ubuntu-slim
+    steps:
+      - name: 📋 Get draft release version
+        id: draft
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG=$(gh release list --draft --json tagName --jq '.[0].tagName')
+          if [ -z "$TAG" ]; then
+            echo "No draft release found"
+            exit 1
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+      - name: 🔄 Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+
+      - name: ⚙️ Install Rust
+        uses: dtolnay/rust-toolchain@4cda84d5c5c54efe2404f9d843567869ab1699d4 # stable
+
+      - name: 🔧 Install git-cliff
+        uses: baptiste0928/cargo-install@f204293d9709061b7bc1756fec3ec4e2cd57dec0 # v3
+        with:
+          crate: git-cliff
+          version: 2.13.1
+          locked: true
+
+      - name: 📝 Generate changelog
+        env:
+          TAG: ${{ steps.draft.outputs.tag }}
+        run: git-cliff --tag "$TAG" --output CHANGELOG.md
+
+      - name: ⚙️ Set up SSH signing key
+        env:
+          SSH_KEY: ${{ secrets.SSH_SIGNING_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/id_ed25519_signing
+          chmod 600 ~/.ssh/id_ed25519_signing
+          git config --global gpg.format ssh
+          git config --global user.signingKey ~/.ssh/id_ed25519_signing
+          git config --global user.name "hrzlgnm"
+          git config --global user.email "hrzlgnm@users.noreply.github.com"
+
+      - name: 📝 Commit changelog
+        env:
+          TAG: ${{ steps.draft.outputs.tag }}
+        run: |
+          git add CHANGELOG.md
+          git commit -S -m "chore(version): update changelog for $TAG"
+
+      - name: 🔓 Disable branch protection
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh api "repos/{owner}/{repo}/rulesets/10506365" -X PATCH -f enforcement="disabled"
+
+      - name: 📤 Push to main
+        run: git push origin main
+
+      - name: 🔒 Re-enable branch protection
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh api "repos/{owner}/{repo}/rulesets/10506365" -X PATCH -f enforcement="active"
+
+      - name: 🏷️ Create tag
+        env:
+          TAG: ${{ steps.draft.outputs.tag }}
+        run: |
+          git tag "$TAG"
+          git push origin "$TAG"
+
+      - name: 🚀 Publish release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.draft.outputs.tag }}
+        run: gh release edit "$TAG" --draft=false --target main
+
+      - name: 🧹 Cleanup SSH signing key
+        if: always()
+        run: rm -f ~/.ssh/id_ed25519_signing
