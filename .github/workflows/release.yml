@@ -1,0 +1,135 @@
+# Copyright 2026 hrzlgnm
+# SPDX-License-Identifier: MIT-0
+
+name: "🚀 Release"
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ruleset-modification
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: "🚀 Release"
+    runs-on: ubuntu-slim
+    env:
+      GH_TOKEN: ${{ secrets.GH_ADMIN_TOKEN }}
+      RULESET: repos/${{ github.repository }}/rulesets/${{ secrets.RULESET_ID }}
+    steps:
+      - name: 🛡️ Verify secrets are configured
+        run: |
+          if [ -z "${{ secrets.RULESET_ID }}" ]; then
+            echo "Error: secrets.RULESET_ID is not set. Please configure the RULESET_ID secret in repository settings."
+            echo "This secret should contain the ID of the ruleset used to disable enforcement during version bump."
+            exit 1
+          fi
+          if [ -z "${{ secrets.GH_ADMIN_TOKEN }}" ]; then
+            echo "Error: secrets.GH_ADMIN_TOKEN is not set. Please configure the GH_ADMIN_TOKEN secret in repository settings."
+            echo "This secret should contain a PAT with administration write access for ruleset management."
+            exit 1
+          fi
+          echo "All required secrets are configured"
+
+      - name: 📋 Get draft release version
+        id: draft
+        run: |
+          TAG=$(gh release list --draft --json tagName --jq '.[0].tagName')
+          if [ -z "$TAG" ]; then
+            echo "No draft release found"
+            exit 1
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+      - name: 🔄 Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: ⚙️ Install Rust
+        uses: dtolnay/rust-toolchain@4cda84d5c5c54efe2404f9d843567869ab1699d4 # stable
+
+      - name: 🔧 Install git-cliff
+        uses: baptiste0928/cargo-install@f204293d9709061b7bc1756fec3ec4e2cd57dec0 # v3
+        with:
+          crate: git-cliff
+          version: 2.13.1
+          locked: true
+
+      - name: 📝 Generate changelog
+        env:
+          TAG: ${{ steps.draft.outputs.tag }}
+        run: git-cliff --tag "$TAG" --output CHANGELOG.md
+
+      - name: ⚙️ Set up SSH signing key
+        env:
+          SSH_KEY: ${{ secrets.SSH_SIGNING_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/id_ed25519_signing
+          chmod 600 ~/.ssh/id_ed25519_signing
+          git config --global gpg.format ssh
+          git config --global user.signingKey ~/.ssh/id_ed25519_signing
+          git config --global user.name "hrzlgnm"
+          git config --global user.email "hrzlgnm@users.noreply.github.com"
+
+      - name: 📝 Commit changelog
+        env:
+          TAG: ${{ steps.draft.outputs.tag }}
+        run: |
+          git add CHANGELOG.md
+          git commit -S -m "chore(version): update changelog for $TAG"
+
+      - name: 🔓 Disable branch protection
+        run: |
+          gh api \
+          -H "Accept: application/vnd.github+json" \
+          "${RULESET}" | jq '.enforcement = "disabled"' | \
+          gh api \
+          --method PUT \
+          -H "Accept: application/vnd.github+json" \
+          "${RULESET}" \
+          --input -
+
+      - name: 📤 Push to main
+        env:
+          GH_TOKEN: ${{ secrets.GH_CONTENT_WRITE }}
+        run: |
+          git remote set-url origin "https://x-access-token:$GH_TOKEN@github.com/$GITHUB_REPOSITORY.git"
+          git push origin main
+
+      - name: 🔒 Re-enable branch protection
+        if: always()
+        run: |
+          gh api \
+          -H "Accept: application/vnd.github+json" \
+          "${RULESET}" | jq '.enforcement = "active"' | \
+          gh api \
+          --method PUT \
+          -H "Accept: application/vnd.github+json" \
+          "${RULESET}" \
+          --input -
+
+      - name: 🏷️ Create tag
+        env:
+          TAG: ${{ steps.draft.outputs.tag }}
+          GH_TOKEN: ${{ secrets.GH_CONTENT_WRITE }}
+        run: |
+          git remote set-url origin "https://x-access-token:$GH_TOKEN@github.com/$GITHUB_REPOSITORY.git"
+          git tag "$TAG"
+          git push origin "$TAG"
+
+      - name: 🚀 Publish release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.draft.outputs.tag }}
+        run: gh release edit "$TAG" --draft=false --target main
+
+      - name: 🧹 Cleanup SSH signing key
+        if: always()
+        run: rm -f ~/.ssh/id_ed25519_signing
