@@ -29,6 +29,7 @@ jobs:
       - name: 🔄 Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
+          ref: main
           fetch-depth: 0
 
       - name: ⚙️ Install Rust
@@ -68,21 +69,27 @@ jobs:
       - name: 🔓 Disable branch protection
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh api "repos/{owner}/{repo}/rulesets/10506365" -X PATCH -f enforcement="disabled"
+        run: gh api "repos/{owner}/{repo}/rulesets/10506365" -X PUT -f enforcement="disabled"
 
       - name: 📤 Push to main
-        run: git push origin main
+        env:
+          GH_TOKEN: ${{ secrets.GH_CONTENT_WRITE }}
+        run: |
+          git remote set-url origin "https://x-access-token:$GH_TOKEN@github.com/$GITHUB_REPOSITORY.git"
+          git push origin main
 
       - name: 🔒 Re-enable branch protection
         if: always()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh api "repos/{owner}/{repo}/rulesets/10506365" -X PATCH -f enforcement="active"
+        run: gh api "repos/{owner}/{repo}/rulesets/10506365" -X PUT -f enforcement="active"
 
       - name: 🏷️ Create tag
         env:
           TAG: ${{ steps.draft.outputs.tag }}
+          GH_TOKEN: ${{ secrets.GH_CONTENT_WRITE }}
         run: |
+          git remote set-url origin "https://x-access-token:$GH_TOKEN@github.com/$GITHUB_REPOSITORY.git"
           git tag "$TAG"
           git push origin "$TAG"
 
