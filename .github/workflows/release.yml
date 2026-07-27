@@ -10,7 +10,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: ruleset-modification
+  group: release-operations
   cancel-in-progress: false
 
 jobs:
