@@ -13,7 +13,7 @@ permissions:
   pull-requests: write # Needed to create/update the pull request
 
 concurrency:
-  group: update-changelog
+  group: release-operations
   cancel-in-progress: true
 
 jobs:
