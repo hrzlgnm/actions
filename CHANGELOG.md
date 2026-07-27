@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add release workflow (#171) ([#171](https://github.com/hrzlgnm/actions/pull/171))
 
+### Fixed
+
+- Use shared concurrency group to prevent workflow races (#173) ([#173](https://github.com/hrzlgnm/actions/pull/173))
+
 ## [2.4.0] - 2026-07-26 [compare](https://github.com/hrzlgnm/actions/compare/v2.3.1...v2.4.0)
 
 ### Added
