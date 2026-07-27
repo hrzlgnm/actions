@@ -21,14 +21,19 @@ jobs:
       GH_TOKEN: ${{ secrets.GH_ADMIN_TOKEN }}
       RULESET: repos/${{ github.repository }}/rulesets/${{ secrets.RULESET_ID }}
     steps:
-      - name: 🛡️ Verify RULESET_ID secret is configured
+      - name: 🛡️ Verify secrets are configured
         run: |
           if [ -z "${{ secrets.RULESET_ID }}" ]; then
             echo "Error: secrets.RULESET_ID is not set. Please configure the RULESET_ID secret in repository settings."
             echo "This secret should contain the ID of the ruleset used to disable enforcement during version bump."
             exit 1
           fi
-          echo "RULESET_ID secret is configured"
+          if [ -z "${{ secrets.GH_ADMIN_TOKEN }}" ]; then
+            echo "Error: secrets.GH_ADMIN_TOKEN is not set. Please configure the GH_ADMIN_TOKEN secret in repository settings."
+            echo "This secret should contain a PAT with administration write access for ruleset management."
+            exit 1
+          fi
+          echo "All required secrets are configured"
 
       - name: 📋 Get draft release version
         id: draft
