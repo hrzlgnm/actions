@@ -40,7 +40,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          TAG=$(gh release list -R "${{ github.repository }}" --json tagName,isDraft --jq 'map(select(.isDraft)) | .[0].tagName')
+          TAG=$(gh api "/repos/${{ github.repository }}/releases?per_page=100" --paginate | jq -s 'map(.[]) | map(select(.draft)) | .[0].tag_name // empty')
           if [ -z "$TAG" ]; then
             echo "No draft release found"
             exit 1
