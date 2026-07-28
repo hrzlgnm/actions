@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Wait for release workflow in ci.yml to prevent race with auto-merge (#184) ([#184](https://github.com/hrzlgnm/actions/pull/184))
 
+- Break circular wait deadlock between ci, changelog, and release workflows (#187) ([#187](https://github.com/hrzlgnm/actions/pull/187))
+
 ## [2.5.3] - 2026-07-28 [compare](https://github.com/hrzlgnm/actions/compare/v2.5.2...v2.5.3)
 
 ### Changed
