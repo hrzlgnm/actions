@@ -12,7 +12,8 @@ Collection of reusable GitHub Actions workflows. Published for external consumpt
 - **Pinned dependencies** — All actions and tools pinned to SHA commit hashes with version comments (e.g. `# v3`). Renovate keeps them updated.
 - **Copyright + SPDX** — Every workflow file has `# Copyright 2026 hrzlgnm` and `# SPDX-License-Identifier: MIT-0` headers.
 - **`${{ }}` forbidden in `run:` blocks** — Use `env` vars instead.
-- **Branch naming** — `feat/`, `fix/`, `chore/`, `docs/`, `refactor/`, `perf/`, `renovate/`, `deps/` trigger auto-labeling.
+- **Branch naming** — `feat/`, `fix/`, `chore/`, `docs/`, `refactor/`, `perf/`, `renovate/`, `deps/` trigger auto-labeling by `ci.yml`'s labeler step.
+- **No `--label` on PR create** — Labels are set automatically by the `label-pr` job in `ci.yml`. Do not pass `--label` to `gh pr create`.
 
 ## Workflows
 
