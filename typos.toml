@@ -7,3 +7,6 @@ extend-exclude = [
 
 [default]
 check-filename = true
+
+[default.extend-words]
+alls = "alls" # used by re-actors/alls-green action
