@@ -34,6 +34,10 @@ actionlint .github/workflows/*.yml
 typos .
 ```
 
+## Workflow
+
+After making a change, commit, push, and create a PR — then stop. Don't wait for CI or follow up.
+
 ## Release process
 
 1. Push to `main` triggers `release-drafter` (drafts release) and `update-changelog` (PR with changelog).
