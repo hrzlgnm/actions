@@ -31,6 +31,7 @@ Collection of reusable GitHub Actions workflows. Published for external consumpt
 
 ```sh
 actionlint .github/workflows/*.yml
+typos .
 ```
 
 ## Release process
