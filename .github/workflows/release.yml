@@ -38,7 +38,7 @@ jobs:
       - name: 📋 Get draft release version
         id: draft
         run: |
-          TAG=$(gh release list --json tagName,isDraft --jq 'map(select(.isDraft)) | .[0].tagName')
+          TAG=$(gh release list -R "${{ github.repository }}" --json tagName,isDraft --jq 'map(select(.isDraft)) | .[0].tagName')
           if [ -z "$TAG" ]; then
             echo "No draft release found"
             exit 1
