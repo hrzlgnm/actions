@@ -10,7 +10,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: release
+  group: release-changelog
   cancel-in-progress: false
 
 jobs:
@@ -21,33 +21,6 @@ jobs:
       GH_TOKEN: ${{ secrets.GH_ADMIN_TOKEN }}
       RULESET: repos/${{ github.repository }}/rulesets/${{ secrets.RULESET_ID }}
     steps:
-      - name: ⏳ Wait for CI, release-drafter, and update-changelog to finish
-        env:
-          GH_TOKEN: ${{ github.token }}
-          REPO: ${{ github.repository }}
-        run: |
-          FAILED=0
-          for entry in "CI ci.yml" "release-drafter release-drafter.yml" "update-changelog update-changelog.yml"; do
-            read -r name file <<< "$entry"
-            echo "Checking for in-progress $name runs..."
-            for _ in $(seq 1 40); do
-              RUNS=$(gh api "repos/$REPO/actions/workflows/$file/runs?status=in_progress&per_page=10" \
-                --jq '[.workflow_runs[] | select(.status == "in_progress" or .status == "queued" or .status == "pending") | .id]')
-              COUNT=$(echo "$RUNS" | jq 'length')
-              if [ "$COUNT" -eq 0 ]; then
-                echo "No pending $name runs, proceeding"
-                break
-              fi
-              echo "Waiting for $COUNT $name run(s): $(echo "$RUNS" | jq -c '.') — sleeping 15s..."
-              sleep 15
-            done
-            if [ "$COUNT" -gt 0 ]; then
-              echo "Timed out waiting for $name runs to complete"
-              FAILED=1
-            fi
-          done
-          [ "$FAILED" -eq 0 ] || exit 1
-
       - name: 🛡️ Verify secrets are configured
         run: |
           if [ -z "${{ secrets.RULESET_ID }}" ]; then
