@@ -36,6 +36,28 @@ jobs:
       branch: ${{ steps.branch.outputs.branch }}
       workflows: ${{ steps.filter.outputs.lint }}
     steps:
+      - name: ⏳ Wait for release workflow to finish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          echo "Checking for in-progress release runs..."
+          for _ in $(seq 1 40); do
+            RUNS=$(gh api "repos/$REPO/actions/workflows/release.yml/runs?status=in_progress&per_page=10" \
+              --jq '[.workflow_runs[] | select(.status == "in_progress" or .status == "queued" or .status == "pending") | .id]')
+            COUNT=$(echo "$RUNS" | jq 'length')
+            if [ "$COUNT" -eq 0 ]; then
+              echo "No pending release runs, proceeding"
+              break
+            fi
+            echo "Waiting for $COUNT release run(s): $(echo "$RUNS" | jq -c '.') — sleeping 15s..."
+            sleep 15
+          done
+          if [ "$COUNT" -gt 0 ]; then
+            echo "Timed out waiting for release runs to complete"
+            exit 1
+          fi
+
       - name: 🔄 Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
