@@ -37,6 +37,8 @@ jobs:
 
       - name: 📋 Get draft release version
         id: draft
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           TAG=$(gh release list -R "${{ github.repository }}" --json tagName,isDraft --jq 'map(select(.isDraft)) | .[0].tagName')
           if [ -z "$TAG" ]; then
