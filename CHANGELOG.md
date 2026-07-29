@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Document that labels are set by ci.yml, not via --label on PR create (#186) ([#186](https://github.com/hrzlgnm/actions/pull/186))
 
+- *(version)* Update changelog for v2.5.4
+
 ### Fixed
 
 - Wait for release workflow in ci.yml to prevent race with auto-merge (#184) ([#184](https://github.com/hrzlgnm/actions/pull/184))
