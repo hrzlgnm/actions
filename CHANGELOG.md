@@ -21,6 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Include deps-only releases in changelog (#194) ([#194](https://github.com/hrzlgnm/actions/pull/194))
 
+- Ignore docker digests in typos config (#196) ([#196](https://github.com/hrzlgnm/actions/pull/196))
+
 ## [2.5.4] - 2026-07-28 [compare](https://github.com/hrzlgnm/actions/compare/v2.5.3...v2.5.4)
 
 ### Changed
