@@ -18,6 +18,8 @@ body = """
         ### Fixed\n
     {% elif group == "Changed" -%}\
         ### Changed\n
+    {% elif group == "Dependencies" -%}\
+        ### Dependencies\n
     {% elif group == "Security" -%}\
         ### Security\n
     {% elif group == "Miscellaneous" -%}\
@@ -48,7 +50,7 @@ commit_parsers = [
     { message = "^test", group = "Changed" },
     { message = "^ci", group = "Miscellaneous" },
     { message = "^build", group = "Miscellaneous" },
-    { message = "^chore\\(deps\\)", skip = true },
+    { message = "^chore\\(deps\\)", group = "Dependencies" },
     { message = "^chore\\(renovate", skip = true },
     { message = "^chore: update unreleased changelog", skip = true },
     { message = "^chore", group = "Changed" },
