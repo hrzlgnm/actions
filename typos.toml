@@ -7,6 +7,9 @@ extend-exclude = [
 
 [default]
 check-filename = true
+extend-ignore-re = [
+    "digest to [0-9a-f]+", # docker digests in changelog entries
+]
 
 [default.extend-words]
 alls = "alls" # used by re-actors/alls-green action
