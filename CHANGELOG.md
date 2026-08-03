@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased] [compare](https://github.com/hrzlgnm/actions/compare/v2.5.4...HEAD)
+## [2.5.5] - 2026-08-03 [compare](https://github.com/hrzlgnm/actions/compare/v2.5.4...v2.5.5)
 
 ### Changed
 
@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - *(deps)* Update release-drafter/release-drafter action to v7.7.0 (#190) ([#190](https://github.com/hrzlgnm/actions/pull/190))
 
 - *(deps)* Update docker/login-action action to v4.6.0 (#192) ([#192](https://github.com/hrzlgnm/actions/pull/192))
+
+- *(deps)* Update crate-ci/typos action to v1.49.0 (#198) ([#198](https://github.com/hrzlgnm/actions/pull/198))
 
 ### Fixed
 
