@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Run changelog nightly and create PR as verified github-actions bot (#193) ([#193](https://github.com/hrzlgnm/actions/pull/193))
 
+- *(version)* Update changelog for v2.5.5
+
 ### Dependencies
 
 - *(deps)* Update release-drafter/release-drafter action to v7.7.0 (#190) ([#190](https://github.com/hrzlgnm/actions/pull/190))
