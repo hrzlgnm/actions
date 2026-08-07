@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased] [compare](https://github.com/hrzlgnm/actions/compare/v2.5.5...HEAD)
 
+### Changed
+
+- *(ci)* Auto-approve workflow runs of github-actions[bot] PRs (#204) ([#204](https://github.com/hrzlgnm/actions/pull/204))
+
 ### Dependencies
 
 - *(deps)* Update dtolnay/rust-toolchain digest to 4360b52 (#200) ([#200](https://github.com/hrzlgnm/actions/pull/200))
