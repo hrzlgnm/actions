@@ -84,6 +84,10 @@ jobs:
   approve-bot-pr:
     if: needs.update-changelog.outputs.changed == 'true'
     needs: update-changelog
+    permissions:
+      actions: write
+      contents: read
+      pull-requests: read
     uses: ./.github/workflows/approve-bot-pr-reusable.yml
     with:
       branch: chore/update-changelog

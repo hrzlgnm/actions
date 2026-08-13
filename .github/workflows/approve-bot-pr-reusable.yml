@@ -62,16 +62,13 @@ jobs:
             core.info(`Waiting for and approving workflow runs for PR #${prNumber}`);
             const deadline = Date.now() + 5 * 60 * 1000;
             let approved = 0;
-            let quietRounds = 0;
             while (Date.now() < deadline) {
               const { data } = await github.rest.actions.listWorkflowRunsForRepo({
                 owner, repo, branch, event: 'pull_request', status: 'action_required', per_page: 100,
               });
-              let pending = 0;
               for (const run of data.workflow_runs) {
                 if (run.triggering_actor?.login !== 'github-actions[bot]') continue;
                 if (run.pull_requests?.[0]?.number !== prNumber) continue;
-                pending++;
                 try {
                   await github.rest.actions.approveWorkflowRun({ owner, repo, run_id: run.id });
                   approved++;
@@ -79,14 +76,6 @@ jobs:
                 } catch (err) {
                   core.warning(`Failed to approve run ${run.id}: ${err.message}`);
                 }
-              }
-              if (pending === 0) {
-                if (approved > 0) {
-                  quietRounds++;
-                  if (quietRounds >= 3) break;
-                }
-              } else {
-                quietRounds = 0;
               }
               await new Promise((r) => setTimeout(r, 10000));
             }
