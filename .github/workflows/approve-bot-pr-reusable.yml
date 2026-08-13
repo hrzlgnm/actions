@@ -1,0 +1,82 @@
+# Copyright 2026 hrzlgnm
+# SPDX-License-Identifier: MIT-0
+
+name: "✅ Approve Bot PR Workflows (Reusable)"
+
+on:
+  workflow_call:
+    inputs:
+      branch:
+        type: string
+        required: true
+        description: "Head branch of the github-actions[bot] PR whose workflow runs should be approved"
+  workflow_dispatch:
+    inputs:
+      branch:
+        type: string
+        required: true
+        default: chore/update-changelog
+        description: "Head branch of the github-actions[bot] PR whose workflow runs should be approved"
+
+permissions:
+  actions: write # needed to approve workflow runs
+  contents: read # needed to list workflow runs and PR files
+  pull-requests: read # needed to look up PRs and their files
+
+concurrency:
+  group: approve-bot-pr-${{ github.repository }}-${{ inputs.branch }}
+  cancel-in-progress: false
+
+jobs:
+  approve:
+    runs-on: ubuntu-slim
+    steps:
+      - name: ✅ Approve workflow runs on github-actions[bot] PR
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        env:
+          PR_BRANCH: ${{ inputs.branch }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { owner, repo } = context.repo;
+            const branch = process.env.PR_BRANCH;
+            const { data: pulls } = await github.rest.pulls.list({
+              owner, repo, state: 'open', head: `${owner}:${branch}`,
+            });
+            const pr = pulls[0];
+            if (!pr) {
+              core.warning(`No open PR found for branch ${branch}, nothing to approve`);
+              return;
+            }
+            const prNumber = pr.number;
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner, repo, pull_number: prNumber, per_page: 100,
+            });
+            if (
+              files.length === 3000 ||
+              files.some((f) => f.filename.startsWith('.github/workflows/'))
+            ) {
+              core.warning(`Skipping: PR #${prNumber} has unverified or modified workflow files`);
+              return;
+            }
+            core.info(`Waiting for and approving workflow runs for PR #${prNumber}`);
+            const deadline = Date.now() + 5 * 60 * 1000;
+            let approved = 0;
+            while (Date.now() < deadline) {
+              const { data } = await github.rest.actions.listWorkflowRunsForRepo({
+                owner, repo, branch, event: 'pull_request', status: 'action_required', per_page: 100,
+              });
+              for (const run of data.workflow_runs) {
+                if (run.triggering_actor?.login !== 'github-actions[bot]') continue;
+                if (run.pull_requests?.[0]?.number !== prNumber) continue;
+                try {
+                  await github.rest.actions.approveWorkflowRun({ owner, repo, run_id: run.id });
+                  approved++;
+                  core.info(`Approved run ${run.id} for PR #${prNumber}`);
+                } catch (err) {
+                  core.warning(`Failed to approve run ${run.id}: ${err.message}`);
+                }
+              }
+              await new Promise((r) => setTimeout(r, 10000));
+            }
+            core.info(`Approved ${approved} workflow run(s) for PR #${prNumber}`);
