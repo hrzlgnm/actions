@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - *(deps)* Update dorny/paths-filter action to v4.0.3 (#202) ([#202](https://github.com/hrzlgnm/actions/pull/202))
 
+### Miscellaneous
+
+- Trigger bot PR workflow approval on pull_request to main (#206) ([#206](https://github.com/hrzlgnm/actions/pull/206))
+
 ## [2.5.5] - 2026-08-03 [compare](https://github.com/hrzlgnm/actions/compare/v2.5.4...v2.5.5)
 
 ### Changed
