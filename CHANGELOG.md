@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased] [compare](https://github.com/hrzlgnm/actions/compare/v2.5.5...HEAD)
+## [2.6.0] - 2026-08-13 [compare](https://github.com/hrzlgnm/actions/compare/v2.5.5...v2.6.0)
 
 ### Changed
 
@@ -16,6 +16,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - *(deps)* Update dtolnay/rust-toolchain digest to 4360b52 (#200) ([#200](https://github.com/hrzlgnm/actions/pull/200))
 
 - *(deps)* Update dorny/paths-filter action to v4.0.3 (#202) ([#202](https://github.com/hrzlgnm/actions/pull/202))
+
+### Miscellaneous
+
+- Trigger bot PR workflow approval on pull_request to main (#206) ([#206](https://github.com/hrzlgnm/actions/pull/206))
+
+- Consolidate bot PR workflow approval into update-changelog (#208) ([#208](https://github.com/hrzlgnm/actions/pull/208))
 
 ## [2.5.5] - 2026-08-03 [compare](https://github.com/hrzlgnm/actions/compare/v2.5.4...v2.5.5)
 
