@@ -78,7 +78,7 @@ jobs:
       - uses: canonical/setup-lxd@v1
       - run: sudo snap install snapcraft --classic
       - name: Build snap
-        uses: hrzlgnm/actions/.github/actions/build-snap@v1
+        uses: hrzlgnm/actions/.github/actions/build-snap@v2.7.0
         with:
           verbosity: brief
 ```
