@@ -17,4 +17,27 @@ runs:
         VERBOSITY: ${{ inputs.verbosity }}
       run: |
         set -euo pipefail
+        # Snapcraft with --use-lxd builds inside an LXD container and does
+        # not forward the host GH_TOKEN into that container. It also treats
+        # build-environment values as literals, so a placeholder
+        # `GH_TOKEN: ${GH_TOKEN}` is not expanded and the container shell
+        # fails with "GH_TOKEN: unbound variable". Substitute the real token
+        # as a literal value into snapcraft.yaml's GH_TOKEN build-environment
+        # placeholder before packing.
+        python3 - <<'PY'
+        import os
+        p = "snap/snapcraft.yaml"
+        token = os.environ["GH_TOKEN"]
+        with open(p) as f:
+            s = f.read()
+        placeholder = "GH_TOKEN: ${GH_TOKEN}"
+        assert placeholder in s, (
+            "snapcraft.yaml must contain the 'GH_TOKEN: ${GH_TOKEN}' "
+            "placeholder in a part's build-environment for the build-snap "
+            "action to inject the token"
+        )
+        s = s.replace(placeholder, f"GH_TOKEN: {token}")
+        with open(p, "w") as f:
+            f.write(s)
+        PY
         sudo env GH_TOKEN="$GH_TOKEN" snapcraft pack --use-lxd --verbosity="$VERBOSITY"
