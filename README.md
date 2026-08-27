@@ -59,3 +59,29 @@ jobs:
       events: "pull_request,push"
 ```
 
+## Build snap
+
+Composite action that runs `snapcraft pack --use-lxd`, injecting the workflow
+token as `GH_TOKEN` so an in-build `gh attestation verify` step can
+authenticate to GitHub (gh requires a token even for public repos).
+
+### Quick Start
+
+```yml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+      - uses: canonical/setup-lxd@v1
+      - run: sudo snap install snapcraft --classic
+      - name: Build snap
+        uses: hrzlgnm/actions/.github/actions/build-snap@v1
+        with:
+          verbosity: brief
+```
+
+The `with: verbosity` input is optional and defaults to `brief`.
+

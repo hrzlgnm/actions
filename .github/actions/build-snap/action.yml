@@ -1,0 +1,20 @@
+# Copyright 2026 hrzlgnm
+# SPDX-License-Identifier: MIT-0
+
+name: Build snap
+description: Builds the snap with snapcraft inside LXD, providing GH_TOKEN so the gh attestation verify step in the build can authenticate to GitHub
+inputs:
+  verbosity:
+    description: snapcraft verbosity level
+    required: false
+    default: brief
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+        VERBOSITY: ${{ inputs.verbosity }}
+      run: |
+        set -euo pipefail
+        sudo env GH_TOKEN="$GH_TOKEN" snapcraft pack --use-lxd --verbosity="$VERBOSITY"
