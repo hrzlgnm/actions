@@ -85,32 +85,3 @@ jobs:
 
 The `with: verbosity` input is optional and defaults to `brief`.
 
-## Fetch attestation bundle
-
-Composite action that downloads an upstream release asset and its SLSA
-build-provenance attestation bundle + Sigstore trusted root into the project
-directory, so a `snapcraft --use-lxd` build can verify the binary offline
-(no token inside the container). The outputs land under `$GITHUB_WORKSPACE`,
-which the LXD build mounts at `$SNAPCRAFT_PROJECT_DIR`.
-
-### Quick Start
-
-```yml
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v7
-      - name: Fetch attestation bundle
-        uses: hrzlgnm/actions/.github/actions/fetch-attestation@vX.Y.Z
-        with:
-          repo: hrzlgnm/zux
-          asset: zux_linux_x64
-          # tag: v1.7.1  # optional; if omitted, read source-tag from snap/snapcraft.yaml
-```
-
-The `tag` input is optional; if empty, the action reads `source-tag` from
-`snap/snapcraft.yaml`.
-
