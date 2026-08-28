@@ -61,9 +61,9 @@ jobs:
 
 ## Build snap
 
-Composite action that runs `snapcraft pack --use-lxd`, injecting the workflow
-token as `GH_TOKEN` so an in-build `gh attestation verify` step can
-authenticate to GitHub (gh requires a token even for public repos).
+Composite action that runs `snapcraft pack --use-lxd`. No token is injected:
+provenance verification uses the offline bundle approach (`fetch-attestation` +
+`gh attestation verify --bundle`), so the build container never needs `GH_TOKEN`.
 
 ### Quick Start
 
