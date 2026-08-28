@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.8.0] - 2026-08-28 [compare](https://github.com/hrzlgnm/actions/compare/v2.7.0...v2.8.0)
+
+### Added
+
+- Add fetch-attestation composite action (#214) ([#214](https://github.com/hrzlgnm/actions/pull/214))
+
+### Changed
+
+- Pin build-snap README example to v2.7.0 (#212) ([#212](https://github.com/hrzlgnm/actions/pull/212))
+
+- Drop GH_TOKEN injection from build-snap action (#215) ([#215](https://github.com/hrzlgnm/actions/pull/215))
+
+- Remove fetch-attestation action (#216) ([#216](https://github.com/hrzlgnm/actions/pull/216))
+
+## [2.7.0] - 2026-08-27 [compare](https://github.com/hrzlgnm/actions/compare/v2.6.0...v2.7.0)
+
+### Added
+
+- Add build-snap composite action (#211) ([#211](https://github.com/hrzlgnm/actions/pull/211))
+
+### Dependencies
+
+- *(deps)* Update crate-ci/typos action to v1.49.1 (#210) ([#210](https://github.com/hrzlgnm/actions/pull/210))
+
 ## [2.6.0] - 2026-08-13 [compare](https://github.com/hrzlgnm/actions/compare/v2.5.5...v2.6.0)
 
 ### Changed
