@@ -25,10 +25,11 @@ jobs:
           command: |
             # actionlint version: v1.7.12
             ACTIONLINT_VERSION="v1.7.12"
-
-            # Download checksums file and extract SHA256 for linux_amd64
-            gh release download "$ACTIONLINT_VERSION" --repo rhysd/actionlint --pattern '*checksums*' -D /tmp/actionlint --clobber
-            EXPECTED_SHA256=$(grep "_linux_amd64.tar.gz" /tmp/actionlint/*checksums*.txt | awk '{print $1}')
+            # Pinned SHA256 of actionlint_1.7.12_linux_amd64.tar.gz.
+            # Release-asset exception: tags are mutable, so when bumping
+            # ACTIONLINT_VERSION you must also update EXPECTED_SHA256 from
+            # the new release's checksums file.
+            EXPECTED_SHA256="8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8"
 
             # Download actionlint binary
             gh release download "$ACTIONLINT_VERSION" --repo rhysd/actionlint --pattern '*_linux_amd64.tar.gz' -D /tmp/actionlint --clobber
