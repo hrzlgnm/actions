@@ -12,7 +12,7 @@ jobs:
     name: "🔍 Validate Workflows"
     runs-on: ubuntu-slim
     permissions:
-      contents: read # needed to checkout repository for local retry action
+      contents: read # needed to checkout repository
     steps:
       - name: 🔄 Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -20,8 +20,16 @@ jobs:
           fetch-depth: 1
 
       - name: 🛠️ Install actionlint
-        uses: ./.github/actions/retry
+        # NOTE: do not use ./.github/actions/retry here: in a reusable
+        # workflow ./. resolves to the caller's checkout, which may not
+        # contain the wrapper. Use the pinned remote action directly so
+        # consumers stay green when bumping this reusable workflow.
+        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
         with:
+          timeout_minutes: 5
+          max_attempts: 5
+          retry_wait_seconds: 10
+          warning_on_retry: true
           command: |
             # actionlint version: v1.7.12
             ACTIONLINT_VERSION="v1.7.12"
