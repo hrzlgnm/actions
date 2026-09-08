@@ -5,7 +5,7 @@ name: Retry command
 description: Shared wrapper around nick-fields/retry with repo defaults (node24)
 
 # Consumers pin this action directly, e.g.
-#   uses: hrzlgnm/actions/.github/actions/retry@<sha> # v2.8.5
+#   uses: hrzlgnm/actions/.github/actions/retry@<sha> # v2.9.0
 # NOTE:
 # - Do NOT use this wrapper for steps whose GITHUB_OUTPUT values are read
 #   by later steps (e.g. checksum steps): composite boundaries swallow
