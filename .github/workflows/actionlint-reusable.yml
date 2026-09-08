@@ -21,8 +21,6 @@ jobs:
 
       - name: 🛠️ Install actionlint
         uses: ./.github/actions/retry
-        env:
-          GH_TOKEN: ${{ github.token }}
         with:
           command: |
             # actionlint version: v1.7.12
