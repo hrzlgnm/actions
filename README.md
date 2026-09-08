@@ -85,3 +85,29 @@ jobs:
 
 The `with: verbosity` input is optional and defaults to `brief`.
 
+## Retry commands
+
+Composite action that retries a shell command with `nick-fields/retry`
+(`node24`, 5 attempts, 10s wait between attempts, warning on retry).
+
+### Quick Start
+
+```yml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install dependencies
+        uses: hrzlgnm/actions/.github/actions/retry@v2.9.0
+        with:
+          command: sudo apt-get update && sudo apt-get install -y libwebkit2gtk-4.1-dev
+```
+
+The `with:` inputs (`timeout_minutes`, `max_attempts`, `retry_wait_seconds`,
+`warning_on_retry`, `shell`) are optional. Steps whose `GITHUB_OUTPUT` values
+are read by later steps must use `nick-fields/retry` directly instead —
+composite boundaries swallow outputs.
+
