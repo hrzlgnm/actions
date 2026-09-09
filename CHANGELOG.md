@@ -5,7 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased] [compare](https://github.com/hrzlgnm/actions/compare/v2.8.2...HEAD)
+## [Unreleased] [compare](https://github.com/hrzlgnm/actions/compare/v2.9.0...HEAD)
+
+### Changed
+
+- Fix example pin version in retry action comment (#230) ([#230](https://github.com/hrzlgnm/actions/pull/230))
+
+- Add retry action example to README (#231) ([#231](https://github.com/hrzlgnm/actions/pull/231))
+
+## [2.9.0] - 2026-09-08 [compare](https://github.com/hrzlgnm/actions/compare/v2.8.4...v2.9.0)
+
+### Added
+
+- *(ci)* Add shared retry composite action for consumers (#228) ([#228](https://github.com/hrzlgnm/actions/pull/228))
+
+### Fixed
+
+- Align SPDX headers with MIT LICENSE file (#229) ([#229](https://github.com/hrzlgnm/actions/pull/229))
+
+## [2.8.4] - 2026-09-08 [compare](https://github.com/hrzlgnm/actions/compare/v2.8.3...v2.8.4)
+
+### Fixed
+
+- *(ci)* Use pinned remote retry in reusable workflow (#227) ([#227](https://github.com/hrzlgnm/actions/pull/227))
+
+## [2.8.3] - 2026-09-08 [compare](https://github.com/hrzlgnm/actions/compare/v2.8.2...v2.8.3)
+
+### Added
+
+- *(ci)* Add shared retry wrapper and use for actionlint download (#226) ([#226](https://github.com/hrzlgnm/actions/pull/226))
 
 ### Dependencies
 
