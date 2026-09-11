@@ -161,10 +161,59 @@ are available separately for custom flows.
 | `release-version` | yes | — |
 | `deploy-key` | yes | — |
 
-Granular actions: `aur-fix-ownership` (no inputs; chowns the checkout to
-`runner`), `aur-setup-ssh` (`deploy-key`; installs the key and pins
-`aur.archlinux.org` host keys), `aur-clone-repo` (`package-name`;
-clones to `~/aur`), `aur-check-version` (`release-version`; fails unless
-strictly higher than `~/aur` `pkgver`). Pin them like
-`hrzlgnm/actions/.github/actions/aur-setup-ssh@v2.11.0`.
+Granular actions (pin like `hrzlgnm/actions/.github/actions/aur-setup-ssh@v2.11.0`):
+
+### Fix AUR checkout ownership
+
+Chowns the checkout to `runner` (AUR builder containers run as root).
+No inputs.
+
+```yml
+    - uses: hrzlgnm/actions/.github/actions/aur-fix-ownership@v2.11.0
+```
+
+### Setup AUR SSH deployment key
+
+Installs the deploy key and pins the `aur.archlinux.org` host keys to
+the Arch-published fingerprints (verified, retrying).
+
+```yml
+    - uses: hrzlgnm/actions/.github/actions/aur-setup-ssh@v2.11.0
+      with:
+        deploy-key: ${{ secrets.AUR_DEPLOY_KEY }}
+```
+
+| Input | Required | Default |
+| --- | --- | --- |
+| `deploy-key` | yes | — |
+
+### Clone AUR repo
+
+Clones the AUR package repository to `~/aur`, discarding any previous
+checkout (retrying).
+
+```yml
+    - uses: hrzlgnm/actions/.github/actions/aur-clone-repo@v2.11.0
+      with:
+        package-name: ${{ matrix.package.name }}
+```
+
+| Input | Required | Default |
+| --- | --- | --- |
+| `package-name` | yes | — |
+
+### Check AUR version
+
+Fails unless the release version is strictly higher than the `pkgver`
+recorded in the `~/aur` checkout.
+
+```yml
+    - uses: hrzlgnm/actions/.github/actions/aur-check-version@v2.11.0
+      with:
+        release-version: ${{ needs.release-info.outputs.version }}
+```
+
+| Input | Required | Default |
+| --- | --- | --- |
+| `release-version` | yes | — |
 
