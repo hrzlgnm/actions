@@ -1,0 +1,114 @@
+# Copyright 2026 hrzlgnm
+# SPDX-License-Identifier: MIT
+
+name: "Shell Lint Reusable"
+
+on:
+  workflow_call:
+    inputs:
+      runs-on:
+        description: Runner image for the lint job
+        type: string
+        default: ubuntu-latest
+      scripts-dir:
+        description: Directory with shell scripts to lint
+        type: string
+        default: packaging/aur
+  workflow_dispatch:
+    inputs:
+      runs-on:
+        description: Runner image for the lint job
+        type: string
+        default: ubuntu-latest
+      scripts-dir:
+        description: Directory with shell scripts to lint
+        type: string
+        default: packaging/aur
+
+jobs:
+  shell-lint:
+    name: "🧹 Lint shell scripts"
+    runs-on: ${{ inputs.runs-on }}
+    permissions:
+      contents: read # needed to checkout repository
+    steps:
+      - name: 🔄 Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: 🛠️ Install shellcheck and shfmt
+        # NOTE: do not use ./.github/actions/retry here: in a reusable
+        # workflow ./. resolves to the caller's checkout, which may not
+        # contain the wrapper. Use the pinned remote action directly so
+        # consumers stay green when bumping this reusable workflow.
+        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          retry_wait_seconds: 10
+          warning_on_retry: true
+          command: |
+            set -euo pipefail
+            # shellcheck version: v0.11.0
+            SHELLCHECK_VERSION="v0.11.0"
+            # shfmt version: v3.14.1
+            SHFMT_VERSION="v3.14.1"
+            # Pinned SHA256 per arch. Neither upstream publishes a checksum
+            # file, so when bumping a version refresh these from the release
+            # digests or the install fails closed below.
+            ARCH="$(uname -m)"
+            case "$ARCH" in
+              x86_64 | amd64)
+                SHELLCHECK_ASSET="shellcheck-${SHELLCHECK_VERSION}.linux.x86_64.tar.xz"
+                SHELLCHECK_SHA256="8c3be12b05d5c177a04c29e3c78ce89ac86f1595681cab149b65b97c4e227198"
+                SHFMT_ASSET="shfmt_${SHFMT_VERSION}_linux_amd64"
+                SHFMT_SHA256="76e77641faa025814b77f153b29796b8e6fa2fca03e0c76a691608b86c7ea7bf"
+                ;;
+              aarch64 | arm64)
+                SHELLCHECK_ASSET="shellcheck-${SHELLCHECK_VERSION}.linux.aarch64.tar.xz"
+                SHELLCHECK_SHA256="12b331c1d2db6b9eb13cfca64306b1b157a86eb69db83023e261eaa7e7c14588"
+                SHFMT_ASSET="shfmt_${SHFMT_VERSION}_linux_arm64"
+                SHFMT_SHA256="5f2db09dae91fca848f7adbdd014632e921a383863a2ad7e0450ad3aba0c6489"
+                ;;
+              *)
+                echo "Error: unsupported architecture '$ARCH'" >&2
+                exit 1
+                ;;
+            esac
+            BINDIR="${HOME}/.local/bin"
+            WORKDIR="$(mktemp -d)"
+            trap 'rm -rf "$WORKDIR"' EXIT
+            mkdir -p "$BINDIR"
+            curl -LfsS --retry 5 --retry-delay 5 --retry-all-errors --connect-timeout 15 \
+              -o "$WORKDIR/$SHELLCHECK_ASSET" "https://github.com/koalaman/shellcheck/releases/download/${SHELLCHECK_VERSION}/${SHELLCHECK_ASSET}"
+            curl -LfsS --retry 5 --retry-delay 5 --retry-all-errors --connect-timeout 15 \
+              -o "$WORKDIR/$SHFMT_ASSET" "https://github.com/mvdan/sh/releases/download/${SHFMT_VERSION}/${SHFMT_ASSET}"
+            verify_checksum() {
+              local file="$1"
+              local expected="$2"
+              local actual
+              actual="$(sha256sum "$file" | cut -d' ' -f1)"
+              if [[ "$actual" != "$expected" ]]; then
+                echo "Error: checksum mismatch for $file" >&2
+                echo "  expected: $expected" >&2
+                echo "  actual:   $actual" >&2
+                echo "If the tool version was bumped, refresh the checksums" >&2
+                echo "above from the upstream release digests." >&2
+                return 1
+              fi
+            }
+            verify_checksum "$WORKDIR/$SHELLCHECK_ASSET" "$SHELLCHECK_SHA256"
+            verify_checksum "$WORKDIR/$SHFMT_ASSET" "$SHFMT_SHA256"
+            tar -xJf "$WORKDIR/$SHELLCHECK_ASSET" -C "$WORKDIR"
+            install -m 755 "$WORKDIR/shellcheck-${SHELLCHECK_VERSION}/shellcheck" "$BINDIR/shellcheck"
+            install -m 755 "$WORKDIR/$SHFMT_ASSET" "$BINDIR/shfmt"
+            echo "$BINDIR" >> "$GITHUB_PATH"
+
+      - name: 🧹 Check shell scripts
+        env:
+          SCRIPTS_DIR: ${{ inputs.scripts-dir }}
+        run: |
+          shellcheck -S warning "$SCRIPTS_DIR"/*.sh
+          shfmt --diff --indent 4 --case-indent --binary-next-line "$SCRIPTS_DIR"/*.sh

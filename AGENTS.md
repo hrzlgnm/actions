@@ -24,6 +24,7 @@ Collection of reusable GitHub Actions workflows. Published for external consumpt
 | `update-changelog.yml` | nightly schedule | Run git-cliff, open auto-merge PR with changelog update |
 | `release.yml` | workflow_dispatch | Wait for CI/changelog/drafter, generate final changelog, push, tag, publish |
 | `typos-reusable.yml` | workflow_call | Spell check with `crate-ci/typos` |
+| `shell-lint-reusable.yml` | workflow_call | Install pinned shellcheck/shfmt and lint shell scripts |
 | `actionlint-reusable.yml` | workflow_call | Lint workflow files |
 | `docker-reusable.yml` | workflow_call | Build & push changed Dockerfiles to GHCR |
 | `retry-failed-ci-reusable.yml` | workflow_call | Retry failed jobs from a given workflow |

@@ -41,6 +41,23 @@ jobs:
     uses: hrzlgnm/actions/.github/workflows/actionlint-reusable.yml@v2.1.0
 ```
 
+## Lint shell scripts
+
+Installs pinned `shellcheck`/`shfmt` (checksum-verified, retried) and lints
+a script directory with `shellcheck -S warning` plus `shfmt --diff`. A lint
+finding fails fast without retries.
+
+### Quick Start
+
+```yml
+jobs:
+  lint-scripts:
+    uses: hrzlgnm/actions/.github/workflows/shell-lint-reusable.yml@v2.10.0
+    with:
+      runs-on: ubuntu-latest
+      scripts-dir: packaging/aur
+```
+
 ## Retry failed CI runs
 
 ### Quick Start
