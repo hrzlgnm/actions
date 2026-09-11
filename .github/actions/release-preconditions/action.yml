@@ -1,0 +1,38 @@
+# Copyright 2026 hrzlgnm
+# SPDX-License-Identifier: MIT
+
+name: Check release preconditions
+description: Fail the release unless no draft exists, the tag is unreleased, and the previous tag is published
+
+# Consumers pin this action directly, e.g.
+#   uses: hrzlgnm/actions/.github/actions/release-preconditions@<sha> # v2.14.0
+# NOTE:
+# - Do NOT reference this wrapper via a relative ./. path from a reusable
+#   workflow: ./. resolves to the caller's checkout. Reusable workflows
+#   must use the pinned remote action directly.
+# - The caller must check out with fetch-depth: 0 so tag enumeration works.
+
+inputs:
+  tag-name:
+    description: Tag being released (e.g. ${{ github.ref_name }})
+    required: true
+  repository:
+    description: Repository to query for drafts and releases (owner/repo)
+    required: false
+    default: ${{ github.repository }}
+  github-token:
+    description: Token for gh API calls
+    required: false
+    default: ${{ github.token }}
+
+runs:
+  using: composite
+  steps:
+    - name: 🛑 Check release preconditions
+      shell: bash
+      env:
+        ACTION_DIR: ${{ github.action_path }}
+        TAG_NAME: ${{ inputs.tag-name }}
+        REPOSITORY: ${{ inputs.repository }}
+        GH_TOKEN: ${{ inputs.github-token }}
+      run: '"$ACTION_DIR/check-release-preconditions.sh"'
