@@ -9,6 +9,7 @@ extend-exclude = [
 check-filename = true
 extend-ignore-re = [
     "digest to [0-9a-f]+", # docker digests in changelog entries
+    "(?i)AUR_SSH_FPS=\"[^\"]*\"", # pinned Arch-published AUR SSH host key fingerprints must stay byte-exact
 ]
 
 [default.extend-words]
