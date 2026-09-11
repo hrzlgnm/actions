@@ -14,16 +14,16 @@ description: Fail the release unless no draft exists, the tag is unreleased, and
 
 inputs:
   tag-name:
-    description: Tag being released (e.g. ${{ github.ref_name }})
+    description: Tag being released (e.g. v1.2.3)
     required: true
   repository:
     description: Repository to query for drafts and releases (owner/repo)
     required: false
-    default: ${{ github.repository }}
+    default: ''
   github-token:
     description: Token for gh API calls
     required: false
-    default: ${{ github.token }}
+    default: ''
 
 runs:
   using: composite
@@ -33,6 +33,6 @@ runs:
       env:
         ACTION_DIR: ${{ github.action_path }}
         TAG_NAME: ${{ inputs.tag-name }}
-        REPOSITORY: ${{ inputs.repository }}
-        GH_TOKEN: ${{ inputs.github-token }}
+        REPOSITORY: ${{ inputs.repository || github.repository }}
+        GH_TOKEN: ${{ inputs.github-token || github.token }}
       run: '"$ACTION_DIR/check-release-preconditions.sh"'
