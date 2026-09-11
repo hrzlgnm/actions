@@ -217,3 +217,18 @@ recorded in the `~/aur` checkout.
 | --- | --- | --- |
 | `release-version` | yes | — |
 
+### Lint generated PKGBUILD
+
+Runs `namcap` and `makepkg --verifysource` (retrying) for a generated
+`PKGBUILD`. A leading `~` in the directory is expanded.
+
+```yml
+    - uses: hrzlgnm/actions/.github/actions/aur-makepkg-lint@v2.13.0
+      with:
+        workdir: ~/lint
+```
+
+| Input | Required | Default |
+| --- | --- | --- |
+| `workdir` | yes | — |
+
