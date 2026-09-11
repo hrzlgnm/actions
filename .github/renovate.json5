@@ -42,13 +42,13 @@
                 '/^\\.github/workflows/.*\\.yml$/',
             ],
             matchStrings: [
-                '# ?shellcheck version: \\s*(?<currentValue>v[0-9]+\\.[0-9]+\\.[0-9]+)',
+                'SHELLCHECK_VERSION="(?<currentValue>v[0-9]+\\.[0-9]+\\.[0-9]+)"',
             ],
             depNameTemplate: 'koalaman/shellcheck',
             depTypeTemplate: 'build-dependencies',
             datasourceTemplate: 'github-releases',
             versioningTemplate: 'semver',
-            autoReplaceStringTemplate: '# shellcheck version: {{#if newValue}}{{newValue}}{{/if}}',
+            autoReplaceStringTemplate: 'SHELLCHECK_VERSION="{{#if newValue}}{{newValue}}{{/if}}"',
         },
         {
             matchStringsStrategy: 'any',
@@ -57,13 +57,13 @@
                 '/^\\.github/workflows/.*\\.yml$/',
             ],
             matchStrings: [
-                '# ?shfmt version: \\s*(?<currentValue>v[0-9]+\\.[0-9]+\\.[0-9]+)',
+                'SHFMT_VERSION="(?<currentValue>v[0-9]+\\.[0-9]+\\.[0-9]+)"',
             ],
             depNameTemplate: 'mvdan/sh',
             depTypeTemplate: 'build-dependencies',
             datasourceTemplate: 'github-releases',
             versioningTemplate: 'semver',
-            autoReplaceStringTemplate: '# shfmt version: {{#if newValue}}{{newValue}}{{/if}}',
+            autoReplaceStringTemplate: 'SHFMT_VERSION="{{#if newValue}}{{newValue}}{{/if}}"',
         },
         {
             matchStringsStrategy: 'any',
