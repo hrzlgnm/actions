@@ -22,10 +22,10 @@ if [[ -f PKGBUILD ]]; then
         exit 1
     fi
     current_version="${pkgver_line#pkgver=}"
-    if [[ "$current_version" == "'*'" ]]; then
+    if [[ $current_version == \'*\' ]]; then
         current_version="${current_version#\'}"
         current_version="${current_version%\'}"
-    elif [[ "$current_version" == '"*"' ]]; then
+    elif [[ $current_version == \"*\" ]]; then
         current_version="${current_version#\"}"
         current_version="${current_version%\"}"
     fi
