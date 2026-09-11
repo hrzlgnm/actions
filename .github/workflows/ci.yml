@@ -73,10 +73,19 @@ jobs:
     uses: ./.github/workflows/actionlint-reusable.yml
 
   shell-lint:
+    strategy:
+      fail-fast: false
+      matrix:
+        scripts-dir:
+          - .github/fixtures/shell-lint
+          - .github/actions/aur-fix-ownership
+          - .github/actions/aur-setup-ssh
+          - .github/actions/aur-clone-repo
+          - .github/actions/aur-check-version
     uses: ./.github/workflows/shell-lint-reusable.yml
     with:
       runs-on: ubuntu-latest
-      scripts-dir: .github/fixtures/shell-lint
+      scripts-dir: ${{ matrix.scripts-dir }}
 
   all-required-green: # This job does nothing and is only used for the branch protection
     name: CI Status
