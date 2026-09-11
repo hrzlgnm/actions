@@ -44,11 +44,11 @@ fi
 # 3. The previous version tag must have a published release.
 tags=$(git tag --list 'v*.*.*' --sort=v:refname \
     | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' || true)
-if ! grep -qxF "$tag_name" <<< "$tags"; then
+if ! grep -qxF "$tag_name" <<<"$tags"; then
     echo "::error::current tag '$tag_name' not found among repository tags"
     exit 1
 fi
-prev_tag=$(awk -v tag="$tag_name" '$0 == tag { print prev; exit } { prev = $0 }' <<< "$tags")
+prev_tag=$(awk -v tag="$tag_name" '$0 == tag { print prev; exit } { prev = $0 }' <<<"$tags")
 if [ -z "$prev_tag" ]; then
     echo "No previous version tag before $tag_name; skipping previous-release check"
 else
