@@ -17,10 +17,16 @@ lint_dir="${1:-$HOME/lint}"
 lint_dir="${lint_dir/#\~/$HOME}"
 cd "$lint_dir" || exit 1
 
-# Run namcap and capture output + exit status
+# Run namcap and capture output + exit status. The if-condition shields the
+# assignment from `set -e`, so a namcap crash is reported below instead of
+# aborting silently (a trailing `|| true` would force the status to 0 and
+# report the crash as clean).
 echo ">>> Running namcap..."
-namcap_output=$(namcap PKGBUILD 2>&1) || true
-namcap_status=$?
+if namcap_output=$(namcap PKGBUILD 2>&1); then
+    namcap_status=0
+else
+    namcap_status=$?
+fi
 
 echo "$namcap_output"
 
