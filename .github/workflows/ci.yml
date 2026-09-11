@@ -82,6 +82,7 @@ jobs:
           - .github/actions/aur-setup-ssh
           - .github/actions/aur-clone-repo
           - .github/actions/aur-check-version
+          - .github/actions/aur-makepkg-lint
     uses: ./.github/workflows/shell-lint-reusable.yml
     with:
       runs-on: ubuntu-latest

@@ -1,0 +1,29 @@
+# Copyright 2026 hrzlgnm
+# SPDX-License-Identifier: MIT
+
+name: Lint generated PKGBUILD
+description: Run namcap and verify sources for a generated PKGBUILD (retrying)
+
+# Consumers pin this action directly, e.g.
+#   uses: hrzlgnm/actions/.github/actions/aur-makepkg-lint@<sha> # v2.13.0
+
+inputs:
+  workdir:
+    description: Directory holding the generated PKGBUILD (a leading ~ is expanded)
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
+      env:
+        ACTION_DIR: ${{ github.action_path }}
+        LINT_DIR: ${{ inputs.workdir }}
+      with:
+        timeout_minutes: 10
+        max_attempts: 5
+        retry_wait_seconds: 10
+        warning_on_retry: true
+        # su without --login keeps the step env and only resets
+        # HOME/SHELL/USER/LOGNAME, so the script reads inputs from env.
+        command: su runner -c '"$ACTION_DIR/makepkg-lint.sh" "$LINT_DIR"'
