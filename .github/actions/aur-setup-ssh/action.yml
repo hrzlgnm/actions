@@ -23,7 +23,7 @@ runs:
       # of burning all retry attempts below.
       run: |
         if [[ -z "${AUR_DEPLOY_KEY:-}" ]]; then
-          echo "::error::AUR_DEPLOY_KEY secret is not set. Please configure the AUR SSH deploy key in repository settings." >&2
+          echo "::error::AUR_DEPLOY_KEY secret is not set. Please configure the AUR SSH deploy key in repository settings."
           exit 1
         fi
 

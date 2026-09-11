@@ -42,7 +42,7 @@ mv "$tmp_config" "$config"
 aur_ssh_fps="SHA256:RFzBCUItH9LZS0cKB5UE6ceAYhBD5C8GeOBip8Z11+4 SHA256:uTa/0PndEgPZTf76e1DFqXKJEXKsn7m9ivhLQtzGOCI SHA256:5s5cIyReIfNNVGRFdDbe3hdYiI5OelHGpw2rOUud3Q8"
 ssh-keyscan -H aur.archlinux.org >"$scan_tmp"
 if [[ ! -s "$scan_tmp" ]]; then
-    echo "::error::ssh-keyscan returned no host keys for aur.archlinux.org" >&2
+    echo "::error::ssh-keyscan returned no host keys for aur.archlinux.org"
     exit 1
 fi
 verified=0
@@ -52,7 +52,7 @@ while read -r host type key; do
     case " $aur_ssh_fps " in
         *" $fp "*) ;;
         *)
-            echo "::error::AUR host key $type fingerprint $fp not in Arch-published set, refusing" >&2
+            echo "::error::AUR host key $type fingerprint $fp not in Arch-published set, refusing"
             exit 1
             ;;
     esac
@@ -60,7 +60,7 @@ while read -r host type key; do
     verified=$((verified + 1))
 done <"$scan_tmp"
 if [[ "$verified" -eq 0 ]]; then
-    echo "::error::ssh-keyscan returned no verifiable host keys for aur.archlinux.org" >&2
+    echo "::error::ssh-keyscan returned no verifiable host keys for aur.archlinux.org"
     exit 1
 fi
 touch "${HOME}/.ssh/known_hosts"
