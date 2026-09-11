@@ -73,6 +73,7 @@ jobs:
     uses: ./.github/workflows/actionlint-reusable.yml
 
   shell-lint:
+    needs: [actionlint]
     strategy:
       fail-fast: false
       matrix:
