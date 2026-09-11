@@ -14,6 +14,7 @@ Collection of reusable GitHub Actions workflows. Published for external consumpt
 - **`${{ }}` forbidden in `run:` blocks** — Use `env` vars instead.
 - **Branch naming** — `feat/`, `fix/`, `chore/`, `docs/`, `refactor/`, `perf/`, `renovate/`, `deps/` trigger auto-labeling by `ci.yml`'s labeler step.
 - **No `--label` on PR create** — Labels are set automatically by the `label-pr` job in `ci.yml`. Do not pass `--label` to `gh pr create`.
+- **README documents every action** — Adding a shared action or reusable workflow requires a `README.md` section with a `Quick Start` example (plus an inputs table when it takes inputs). CI does not enforce this; reviewers must.
 
 ## Workflows
 
