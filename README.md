@@ -232,3 +232,25 @@ Runs `namcap` and `makepkg --verifysource` (retrying) for a generated
 | --- | --- | --- |
 | `workdir` | yes | — |
 
+## Check release preconditions
+
+Composite action that blocks a release unless no draft release exists,
+the tag has no release yet, and the previous version tag has a
+published release (first tag exempt). Failures use `::error::`
+annotations. Requires a checkout with full history (`fetch-depth: 0`).
+
+### Quick Start
+
+```yml
+    - name: 🛑 Check release preconditions
+      uses: hrzlgnm/actions/.github/actions/release-preconditions@v2.14.0
+      with:
+        tag-name: ${{ github.ref_name }}
+```
+
+| Input | Required | Default |
+| --- | --- | --- |
+| `tag-name` | yes | — |
+| `repository` | no | `${{ github.repository }}` |
+| `github-token` | no | `${{ github.token }}` |
+
