@@ -136,3 +136,35 @@ jobs:
 | `warning_on_retry` | no | `'true'` |
 | `shell` | no | `'bash'` |
 
+## AUR packaging
+
+Composite actions for Arch Linux AUR publishers running in an Arch
+builder container as root with a `runner` user. `aur-setup` chains the
+full in-job setup in one pinned step; the four granular actions below
+are available separately for custom flows.
+
+### Quick Start
+
+```yml
+    - name: Setup AUR packaging
+      if: github.event.release.tag_name
+      uses: hrzlgnm/actions/.github/actions/aur-setup@v2.12.0
+      with:
+        package-name: ${{ matrix.package.name }}
+        release-version: ${{ needs.release-info.outputs.version }}
+        deploy-key: ${{ secrets.AUR_DEPLOY_KEY }}
+```
+
+| Input | Required | Default |
+| --- | --- | --- |
+| `package-name` | yes | — |
+| `release-version` | yes | — |
+| `deploy-key` | yes | — |
+
+Granular actions: `aur-fix-ownership` (no inputs; chowns the checkout to
+`runner`), `aur-setup-ssh` (`deploy-key`; installs the key and pins
+`aur.archlinux.org` host keys), `aur-clone-repo` (`package-name`;
+clones to `~/aur`), `aur-check-version` (`release-version`; fails unless
+strictly higher than `~/aur` `pkgver`). Pin them like
+`hrzlgnm/actions/.github/actions/aur-setup-ssh@v2.11.0`.
+
