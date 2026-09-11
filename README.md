@@ -136,3 +136,84 @@ jobs:
 | `warning_on_retry` | no | `'true'` |
 | `shell` | no | `'bash'` |
 
+## AUR packaging
+
+Composite actions for Arch Linux AUR publishers running in an Arch
+builder container as root with a `runner` user. `aur-setup` chains the
+full in-job setup in one pinned step; the four granular actions below
+are available separately for custom flows.
+
+### Quick Start
+
+```yml
+    - name: Setup AUR packaging
+      if: github.event.release.tag_name
+      uses: hrzlgnm/actions/.github/actions/aur-setup@v2.12.0
+      with:
+        package-name: ${{ matrix.package.name }}
+        release-version: ${{ needs.release-info.outputs.version }}
+        deploy-key: ${{ secrets.AUR_DEPLOY_KEY }}
+```
+
+| Input | Required | Default |
+| --- | --- | --- |
+| `package-name` | yes | — |
+| `release-version` | yes | — |
+| `deploy-key` | yes | — |
+
+Granular actions (pin like `hrzlgnm/actions/.github/actions/aur-setup-ssh@v2.11.0`):
+
+### Fix AUR checkout ownership
+
+Chowns the checkout to `runner` (AUR builder containers run as root).
+No inputs.
+
+```yml
+    - uses: hrzlgnm/actions/.github/actions/aur-fix-ownership@v2.11.0
+```
+
+### Setup AUR SSH deployment key
+
+Installs the deploy key and pins the `aur.archlinux.org` host keys to
+the Arch-published fingerprints (verified, retrying).
+
+```yml
+    - uses: hrzlgnm/actions/.github/actions/aur-setup-ssh@v2.11.0
+      with:
+        deploy-key: ${{ secrets.AUR_DEPLOY_KEY }}
+```
+
+| Input | Required | Default |
+| --- | --- | --- |
+| `deploy-key` | yes | — |
+
+### Clone AUR repo
+
+Clones the AUR package repository to `~/aur`, discarding any previous
+checkout (retrying).
+
+```yml
+    - uses: hrzlgnm/actions/.github/actions/aur-clone-repo@v2.11.0
+      with:
+        package-name: ${{ matrix.package.name }}
+```
+
+| Input | Required | Default |
+| --- | --- | --- |
+| `package-name` | yes | — |
+
+### Check AUR version
+
+Fails unless the release version is strictly higher than the `pkgver`
+recorded in the `~/aur` checkout.
+
+```yml
+    - uses: hrzlgnm/actions/.github/actions/aur-check-version@v2.11.0
+      with:
+        release-version: ${{ needs.release-info.outputs.version }}
+```
+
+| Input | Required | Default |
+| --- | --- | --- |
+| `release-version` | yes | — |
+
