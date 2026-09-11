@@ -15,6 +15,18 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Check deploy key is configured
+      shell: bash
+      env:
+        AUR_DEPLOY_KEY: ${{ inputs.deploy-key }}
+      # Plain step on purpose: a missing key must fail immediately instead
+      # of burning all retry attempts below.
+      run: |
+        if [[ -z "${AUR_DEPLOY_KEY:-}" ]]; then
+          echo "Error: AUR_DEPLOY_KEY secret is not set. Please configure the AUR SSH deploy key in repository settings." >&2
+          exit 1
+        fi
+
     - uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
       env:
         ACTION_DIR: ${{ github.action_path }}
