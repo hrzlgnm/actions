@@ -18,7 +18,7 @@
 #   REPOSITORY  owner/repo to query (e.g. hrzlgnm/zux)
 #   GH_TOKEN    token for gh API calls
 #
-# Requires: gh CLI and a checkout with full history (fetch-depth: 0)
+# Requires: gh and jq CLIs and a checkout with full history (fetch-depth: 0)
 # for tag enumeration.
 
 set -euo pipefail
@@ -26,9 +26,12 @@ set -euo pipefail
 tag_name="${TAG_NAME:?TAG_NAME must be set}"
 repository="${REPOSITORY:?REPOSITORY must be set}"
 
+# Single paginated fetch of all releases; every check below reuses this
+# snapshot instead of making its own API call (previously three calls).
+releases_json=$(gh api "repos/${repository}/releases?per_page=100" --paginate)
+
 # 1. Never clobber an existing draft release.
-drafts=$(gh api "repos/${repository}/releases?per_page=100" --paginate \
-    -q '[.[] | select(.draft == true) | .tag_name] | join(", ")')
+drafts=$(jq -rs 'map(.[]) | map(select(.draft == true) | .tag_name) | join(", ")' <<<"$releases_json")
 if [ -n "$drafts" ]; then
     echo "::error::refusing to clobber existing draft release(s): $drafts"
     echo "::error::Delete or publish the draft(s) manually, then re-run."
@@ -36,7 +39,7 @@ if [ -n "$drafts" ]; then
 fi
 
 # 2. The tag being released must not have a release yet.
-if gh release view "$tag_name" --repo "$repository" >/dev/null 2>&1; then
+if jq -rs --arg tag "$tag_name" -e 'map(.[]) | map(select(.tag_name == $tag)) | length > 0' <<<"$releases_json" >/dev/null; then
     echo "::error::release '$tag_name' already exists"
     exit 1
 fi
@@ -52,15 +55,17 @@ prev_tag=$(awk -v tag="$tag_name" '$0 == tag { print prev; exit } { prev = $0 }'
 if [ -z "$prev_tag" ]; then
     echo "No previous version tag before $tag_name; skipping previous-release check"
 else
-    is_draft=$(gh release view "$prev_tag" --repo "$repository" \
-        --json isDraft --jq '.isDraft' 2>/dev/null) || {
-        echo "::error::previous tag '$prev_tag' has no associated release; publish it before releasing '$tag_name'"
-        exit 1
-    }
-    if [ "$is_draft" = "true" ]; then
-        echo "::error::previous tag '$prev_tag' has only a draft release; publish it before releasing '$tag_name'"
-        exit 1
-    fi
+    prev_state=$(jq -rs --arg tag "$prev_tag" -r 'map(.[]) | map(select(.tag_name == $tag)) | if length == 0 then "missing" elif .[0].draft == true then "draft" else "published" end' <<<"$releases_json")
+    case "$prev_state" in
+        missing)
+            echo "::error::previous tag '$prev_tag' has no associated release; publish it before releasing '$tag_name'"
+            exit 1
+            ;;
+        draft)
+            echo "::error::previous tag '$prev_tag' has only a draft release; publish it before releasing '$tag_name'"
+            exit 1
+            ;;
+    esac
     echo "Previous tag $prev_tag has a published release"
 fi
 
