@@ -5,7 +5,63 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased] [compare](https://github.com/hrzlgnm/actions/compare/v2.9.0...HEAD)
+## [2.14.1] - 2026-09-11 [compare](https://github.com/hrzlgnm/actions/compare/v2.14.0...v2.14.1)
+
+### Changed
+
+- Document release-preconditions action and require README examples (#243) ([#243](https://github.com/hrzlgnm/actions/pull/243))
+
+### Fixed
+
+- Resolve github context in release-preconditions inputs (#244) ([#244](https://github.com/hrzlgnm/actions/pull/244))
+
+## [2.14.0] - 2026-09-11 [compare](https://github.com/hrzlgnm/actions/compare/v2.13.1...v2.14.0)
+
+### Added
+
+- Add shared release-preconditions action (#240) ([#240](https://github.com/hrzlgnm/actions/pull/240))
+
+### Fixed
+
+- Emit workflow commands on stdout in aur-setup-ssh (#241) ([#241](https://github.com/hrzlgnm/actions/pull/241))
+
+- Wait for actionlint before shell-lint in ci (#242) ([#242](https://github.com/hrzlgnm/actions/pull/242))
+
+## [2.13.1] - 2026-09-11 [compare](https://github.com/hrzlgnm/actions/compare/v2.13.0...v2.13.1)
+
+### Fixed
+
+- Report namcap crashes instead of masking them as clean (#239) ([#239](https://github.com/hrzlgnm/actions/pull/239))
+
+## [2.13.0] - 2026-09-11 [compare](https://github.com/hrzlgnm/actions/compare/v2.12.1...v2.13.0)
+
+### Added
+
+- Add shared aur-makepkg-lint action (#238) ([#238](https://github.com/hrzlgnm/actions/pull/238))
+
+## [2.12.1] - 2026-09-11 [compare](https://github.com/hrzlgnm/actions/compare/v2.12.0...v2.12.1)
+
+### Fixed
+
+- Fail fast with friendly message on missing AUR deploy key (#237) ([#237](https://github.com/hrzlgnm/actions/pull/237))
+
+## [2.12.0] - 2026-09-11 [compare](https://github.com/hrzlgnm/actions/compare/v2.11.0...v2.12.0)
+
+### Added
+
+- Add aur-setup composite chaining the AUR packaging steps (#236) ([#236](https://github.com/hrzlgnm/actions/pull/236))
+
+## [2.11.0] - 2026-09-11 [compare](https://github.com/hrzlgnm/actions/compare/v2.10.0...v2.11.0)
+
+### Added
+
+- Add shared AUR packaging actions (#235) ([#235](https://github.com/hrzlgnm/actions/pull/235))
+
+## [2.10.0] - 2026-09-11 [compare](https://github.com/hrzlgnm/actions/compare/v2.9.0...v2.10.0)
+
+### Added
+
+- Add shell-lint reusable workflow with pinned shellcheck/shfmt (#234) ([#234](https://github.com/hrzlgnm/actions/pull/234))
 
 ### Changed
 
