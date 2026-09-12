@@ -77,6 +77,10 @@ jobs:
                   core.warning(`Failed to approve run ${run.id}: ${err.message}`);
                 }
               }
+              if (approved > 0 && data.workflow_runs.length === 0) {
+                core.info(`No more pending runs after approving ${approved}, done`);
+                break;
+              }
               await new Promise((r) => setTimeout(r, 10000));
             }
             core.info(`Approved ${approved} workflow run(s) for PR #${prNumber}`);
