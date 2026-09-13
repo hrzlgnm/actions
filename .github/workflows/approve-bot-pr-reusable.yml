@@ -15,7 +15,7 @@ on:
       branch:
         type: string
         required: true
-        default: chore/update-changelog
+        default: release-please--branches--main
         description: "Head branch of the github-actions[bot] PR whose workflow runs should be approved"
 
 permissions:
