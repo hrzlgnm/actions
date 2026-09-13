@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.14.4](https://github.com/hrzlgnm/actions/compare/v2.14.3...v2.14.4) (2026-09-13)
+
+
+### Bug Fixes
+
+* fail fast when aur-setup deploy-key is missing ([#250](https://github.com/hrzlgnm/actions/issues/250)) ([e57b444](https://github.com/hrzlgnm/actions/commit/e57b444cadd62c46078d3d61568e8ca2a704ec36))
+* update signed commits docs after release-please switch ([#252](https://github.com/hrzlgnm/actions/issues/252)) ([f2f889e](https://github.com/hrzlgnm/actions/commit/f2f889eecd23cbe1c604ee6184a6567e91321326))
+
 ## [2.14.1] - 2026-09-11 [compare](https://github.com/hrzlgnm/actions/compare/v2.14.0...v2.14.1)
 
 ### Changed
@@ -780,5 +788,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Onboard renovate
-
-
