@@ -8,7 +8,7 @@ Collection of reusable GitHub Actions workflows. Published for external consumpt
 
 - **Conventional commits** — All commits follow conventional commits format. `release-please` parses them for changelogs.
 - **Semantic versioning** — Tags are `vX.Y.Z`.
-- **Signed commits** — Changelog commits are authored by `github-actions[bot]` via the GitHub API (Verified). Release version-bump commits use SSH signing key from secrets.
+- **Signed commits** — Release PRs and version-bump commits are authored by `github-actions[bot]` via the GitHub API (Verified) using `GITHUB_TOKEN`.
 - **Pinned dependencies** — All actions and tools pinned to SHA commit hashes with version comments (e.g. `# v3`). Renovate keeps them updated.
 - **Copyright + SPDX** — Every workflow file has `# Copyright 2026 hrzlgnm` and `# SPDX-License-Identifier: MIT-0` headers.
 - **`${{ }}` forbidden in `run:` blocks** — Use `env` vars instead.
