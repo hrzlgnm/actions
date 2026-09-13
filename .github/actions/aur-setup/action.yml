@@ -9,8 +9,6 @@ description: Fix checkout ownership, install the AUR SSH key, clone the AUR repo
 #
 # Runs all steps in the caller's job (same container and filesystem), so the
 # checkout ownership, ~/.ssh keys, and ~/aur clone are visible to later steps.
-# Sibling scripts are addressed relative to this action's directory; no
-# version pins between actions in this repo, they always move atomically.
 
 inputs:
   package-name:
@@ -29,7 +27,7 @@ runs:
     - shell: bash
       env:
         ACTION_DIR: ${{ github.action_path }}
-      run: '"$ACTION_DIR/../aur-fix-ownership/fix-ownership.sh"'
+      run: '"$ACTION_DIR/fix-ownership.sh"'
 
     - uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
       env:
@@ -42,7 +40,7 @@ runs:
         warning_on_retry: true
         # su without --login keeps the step env and only resets
         # HOME/SHELL/USER/LOGNAME, so the script reads inputs from env.
-        command: su runner -c '"$ACTION_DIR/../aur-setup-ssh/setup-aur-ssh.sh"'
+        command: su runner -c '"$ACTION_DIR/setup-aur-ssh.sh"'
 
     - uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
       env:
@@ -55,7 +53,7 @@ runs:
         warning_on_retry: true
         # su without --login keeps the step env and only resets
         # HOME/SHELL/USER/LOGNAME, so the script reads inputs from env.
-        command: su runner -c '"$ACTION_DIR/../aur-clone-repo/clone-aur-repo.sh"'
+        command: su runner -c '"$ACTION_DIR/clone-aur-repo.sh"'
 
     - shell: bash
       env:
@@ -63,4 +61,4 @@ runs:
         RELEASE_VERSION: ${{ inputs.release-version }}
       # su without --login keeps the step env and only resets
       # HOME/SHELL/USER/LOGNAME, so the script reads inputs from env.
-      run: su runner -c '"$ACTION_DIR/../aur-check-version/check-aur-version.sh"'
+      run: su runner -c '"$ACTION_DIR/check-aur-version.sh"'

@@ -76,32 +76,6 @@ jobs:
       events: "pull_request,push"
 ```
 
-## Build snap
-
-Composite action that runs `snapcraft pack --use-lxd`. No token is injected:
-provenance verification uses the offline bundle approach (`fetch-attestation` +
-`gh attestation verify --bundle`), so the build container never needs `GH_TOKEN`.
-
-### Quick Start
-
-```yml
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v7
-      - uses: canonical/setup-lxd@v1
-      - run: sudo snap install snapcraft --classic
-      - name: Build snap
-        uses: hrzlgnm/actions/.github/actions/build-snap@v2.7.0
-        with:
-          verbosity: brief
-```
-
-The `with: verbosity` input is optional and defaults to `brief`.
-
 ## Retry commands
 
 > [!WARNING]
@@ -138,10 +112,10 @@ jobs:
 
 ## AUR packaging
 
-Composite actions for Arch Linux AUR publishers running in an Arch
+Composite action for Arch Linux AUR publishers running in an Arch
 builder container as root with a `runner` user. `aur-setup` chains the
-full in-job setup in one pinned step; the four granular actions below
-are available separately for custom flows.
+full in-job setup (fix checkout ownership, install the AUR SSH key,
+clone the AUR repo, verify the version) in one pinned step.
 
 ### Quick Start
 
@@ -161,62 +135,6 @@ are available separately for custom flows.
 | `release-version` | yes | — |
 | `deploy-key` | yes | — |
 
-Granular actions (pin like `hrzlgnm/actions/.github/actions/aur-setup-ssh@v2.11.0`):
-
-### Fix AUR checkout ownership
-
-Chowns the checkout to `runner` (AUR builder containers run as root).
-No inputs.
-
-```yml
-    - uses: hrzlgnm/actions/.github/actions/aur-fix-ownership@v2.11.0
-```
-
-### Setup AUR SSH deployment key
-
-Installs the deploy key and pins the `aur.archlinux.org` host keys to
-the Arch-published fingerprints (verified, retrying).
-
-```yml
-    - uses: hrzlgnm/actions/.github/actions/aur-setup-ssh@v2.11.0
-      with:
-        deploy-key: ${{ secrets.AUR_DEPLOY_KEY }}
-```
-
-| Input | Required | Default |
-| --- | --- | --- |
-| `deploy-key` | yes | — |
-
-### Clone AUR repo
-
-Clones the AUR package repository to `~/aur`, discarding any previous
-checkout (retrying).
-
-```yml
-    - uses: hrzlgnm/actions/.github/actions/aur-clone-repo@v2.11.0
-      with:
-        package-name: ${{ matrix.package.name }}
-```
-
-| Input | Required | Default |
-| --- | --- | --- |
-| `package-name` | yes | — |
-
-### Check AUR version
-
-Fails unless the release version is strictly higher than the `pkgver`
-recorded in the `~/aur` checkout.
-
-```yml
-    - uses: hrzlgnm/actions/.github/actions/aur-check-version@v2.11.0
-      with:
-        release-version: ${{ needs.release-info.outputs.version }}
-```
-
-| Input | Required | Default |
-| --- | --- | --- |
-| `release-version` | yes | — |
-
 ### Lint generated PKGBUILD
 
 Runs `namcap` and `makepkg --verifysource` (retrying) for a generated
@@ -231,26 +149,4 @@ Runs `namcap` and `makepkg --verifysource` (retrying) for a generated
 | Input | Required | Default |
 | --- | --- | --- |
 | `workdir` | yes | — |
-
-## Check release preconditions
-
-Composite action that blocks a release unless no draft release exists,
-the tag has no release yet, and the previous version tag has a
-published release (first tag exempt). Failures use `::error::`
-annotations. Requires a checkout with full history (`fetch-depth: 0`).
-
-### Quick Start
-
-```yml
-    - name: 🛑 Check release preconditions
-      uses: hrzlgnm/actions/.github/actions/release-preconditions@v2.14.0
-      with:
-        tag-name: ${{ github.ref_name }}
-```
-
-| Input | Required | Default |
-| --- | --- | --- |
-| `tag-name` | yes | — |
-| `repository` | no | `${{ github.repository }}` |
-| `github-token` | no | `${{ github.token }}` |
 
