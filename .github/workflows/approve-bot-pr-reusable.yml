@@ -49,38 +49,67 @@ jobs:
               return;
             }
             const prNumber = pr.number;
+            let headSha = pr.head.sha;
             const files = await github.paginate(github.rest.pulls.listFiles, {
               owner, repo, pull_number: prNumber, per_page: 100,
             });
-            if (
-              files.length === 3000 ||
-              files.some((f) => f.filename.startsWith('.github/workflows/'))
-            ) {
+            const hasWorkflowChanges = (fileList) =>
+              fileList.length === 3000 ||
+              fileList.some((f) => f.filename.startsWith('.github/workflows/'));
+            if (hasWorkflowChanges(files)) {
               core.warning(`Skipping: PR #${prNumber} has unverified or modified workflow files`);
               return;
             }
-            core.info(`Waiting for and approving workflow runs for PR #${prNumber}`);
+            core.info(`Waiting for and approving latest workflow runs for PR #${prNumber} (head ${headSha})`);
             const deadline = Date.now() + 5 * 60 * 1000;
             let approved = 0;
             while (Date.now() < deadline) {
+              try {
+                const { data: freshPr } = await github.rest.pulls.get({
+                  owner, repo, pull_number: prNumber,
+                });
+                if (freshPr.head.sha !== headSha) {
+                  headSha = freshPr.head.sha;
+                  approved = 0;
+                  core.info(`PR #${prNumber} head moved to ${headSha}, re-checking files`);
+                  const freshFiles = await github.paginate(github.rest.pulls.listFiles, {
+                    owner, repo, pull_number: prNumber, per_page: 100,
+                  });
+                  if (hasWorkflowChanges(freshFiles)) {
+                    core.warning(`Skipping: PR #${prNumber} has unverified or modified workflow files`);
+                    return;
+                  }
+                }
+              } catch (err) {
+                core.warning(`Failed to refresh PR #${prNumber}: ${err.message}`);
+              }
               const { data } = await github.rest.actions.listWorkflowRunsForRepo({
                 owner, repo, branch, event: 'pull_request', status: 'action_required', per_page: 100,
               });
-              for (const run of data.workflow_runs) {
-                if (run.triggering_actor?.login !== 'github-actions[bot]') continue;
-                if (run.pull_requests?.[0]?.number !== prNumber) continue;
+              const pending = data.workflow_runs.filter(
+                (run) =>
+                  run.triggering_actor?.login === 'github-actions[bot]' &&
+                  run.pull_requests?.[0]?.number === prNumber,
+              );
+              const current = pending.filter((run) => run.head_sha === headSha);
+              for (const run of pending) {
+                if (run.head_sha !== headSha) {
+                  core.info(`Skipping stale run ${run.id} (head ${run.head_sha}, latest ${headSha})`);
+                }
+              }
+              for (const run of current) {
                 try {
                   await github.rest.actions.approveWorkflowRun({ owner, repo, run_id: run.id });
                   approved++;
-                  core.info(`Approved run ${run.id} for PR #${prNumber}`);
+                  core.info(`Approved run ${run.id} for PR #${prNumber} (head ${headSha})`);
                 } catch (err) {
                   core.warning(`Failed to approve run ${run.id}: ${err.message}`);
                 }
               }
-              if (approved > 0 && data.workflow_runs.length === 0) {
-                core.info(`No more pending runs after approving ${approved}, done`);
+              if (approved > 0 && current.length === 0) {
+                core.info(`No more pending runs for latest head ${headSha} after approving ${approved}, done`);
                 break;
               }
               await new Promise((r) => setTimeout(r, 10000));
             }
-            core.info(`Approved ${approved} workflow run(s) for PR #${prNumber}`);
+            core.info(`Approved ${approved} workflow run(s) for PR #${prNumber} (head ${headSha})`);
