@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.14.6](https://github.com/hrzlgnm/actions/compare/v2.14.5...v2.14.6) (2026-09-15)
+
+
+### Bug Fixes
+
+* delete stale bot-pr runs and release on deps commits ([#257](https://github.com/hrzlgnm/actions/issues/257)) ([34b0fc7](https://github.com/hrzlgnm/actions/commit/34b0fc7b723161ebaae23c36b4746529e93a6c4e))
+* exit approve-bot-pr early when nothing needs approval ([#263](https://github.com/hrzlgnm/actions/issues/263)) ([cca259c](https://github.com/hrzlgnm/actions/commit/cca259ccd3808e5d7ac8721f0f361253ce14b197))
+* guard approve-bot-pr run filter against undefined entries ([#261](https://github.com/hrzlgnm/actions/issues/261)) ([442c2aa](https://github.com/hrzlgnm/actions/commit/442c2aa6f9a25b221d5e0e99feff3844d549b780))
+* use direct REST instead of paginate for workflow runs in approve-bot-pr ([#265](https://github.com/hrzlgnm/actions/issues/265)) ([c8066d8](https://github.com/hrzlgnm/actions/commit/c8066d87f680a013c51f4cf6db38070b38dff9cc))
+* wait for runs to appear regardless of state in approve-bot-pr ([#264](https://github.com/hrzlgnm/actions/issues/264)) ([7c694ed](https://github.com/hrzlgnm/actions/commit/7c694ed26838e86bf82613dca7ce48a4b53d1f14))
+
+
+### Documentation
+
+* document release-please JSON formatting rule ([#259](https://github.com/hrzlgnm/actions/issues/259)) ([0d8cba4](https://github.com/hrzlgnm/actions/commit/0d8cba47fc7a69d00b0181291c17d5dc47170ab5))
+
+
+### Miscellaneous Chores
+
+* **deps:** update crate-ci/typos action to v1.50.2 ([#255](https://github.com/hrzlgnm/actions/issues/255)) ([8834496](https://github.com/hrzlgnm/actions/commit/883449623fe7809e7939070fe67111ff495bc0eb))
+* **deps:** update docker/build-push-action action to v7.4.0 ([#256](https://github.com/hrzlgnm/actions/issues/256)) ([1920b78](https://github.com/hrzlgnm/actions/commit/1920b7860558cf92bf6ed88d86937272bd472265))
+* disable coderabbit request-changes workflow ([#258](https://github.com/hrzlgnm/actions/issues/258)) ([58c0a7b](https://github.com/hrzlgnm/actions/commit/58c0a7b1fcac2b40890886fb069afc2507950cab))
+* show all commit types in release notes ([#262](https://github.com/hrzlgnm/actions/issues/262)) ([e6f93cd](https://github.com/hrzlgnm/actions/commit/e6f93cd696e352e5e087d27d4d644f08aca3a3a9))
+
 ## [2.14.5](https://github.com/hrzlgnm/actions/compare/v2.14.4...v2.14.5) (2026-09-14)
 
 
