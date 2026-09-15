@@ -84,17 +84,17 @@ jobs:
               } catch (err) {
                 core.warning(`Failed to refresh PR #${prNumber}: ${err.message}`);
               }
-              const runs = await github.paginate(
+              const runs = (await github.paginate(
                 github.rest.actions.listWorkflowRunsForRepo,
                 { owner, repo, branch, event: 'pull_request', status: 'action_required', per_page: 100 },
                 (response) => response.data.workflow_runs,
-              );
-              const pending = runs.filter(
+              )) ?? [];
+              const pending = (Array.isArray(runs) ? runs : []).filter(
                 (run) =>
-                  run.triggering_actor?.login === 'github-actions[bot]' &&
-                  run.pull_requests?.[0]?.number === prNumber,
+                  run?.triggering_actor?.login === 'github-actions[bot]' &&
+                  run?.pull_requests?.[0]?.number === prNumber,
               );
-              const current = pending.filter((run) => run.head_sha === headSha);
+              const current = pending.filter((run) => run?.head_sha === headSha);
               try {
                 const { data: recheckedPr } = await github.rest.pulls.get({
                   owner, repo, pull_number: prNumber,
