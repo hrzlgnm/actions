@@ -21,6 +21,7 @@ jobs:
     outputs:
       release_created: ${{ steps.release.outputs.release_created }}
       prs_created: ${{ steps.release.outputs.prs_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
     steps:
       - uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5
         id: release
@@ -42,3 +43,21 @@ jobs:
     uses: ./.github/workflows/approve-bot-pr-reusable.yml
     with:
       branch: release-please--branches--main
+
+  publish:
+    # This repo's releases carry notes only, so the draft is complete as soon
+    # as release-please creates it. Publishing is the workflow's job alone:
+    # leave the draft alone.
+    needs: [release-please]
+    if: needs.release-please.outputs.release_created == 'true'
+    name: "📢 Publish Release"
+    runs-on: ubuntu-slim
+    permissions:
+      contents: write # to publish the draft release
+    steps:
+      - name: 📢 Publish draft release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ needs.release-please.outputs.tag_name }}
+        run: gh release edit "$TAG_NAME" --draft=false --prerelease=false

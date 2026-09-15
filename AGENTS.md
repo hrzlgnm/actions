@@ -46,4 +46,5 @@ Pushing to `main` triggers `release-please`, which opens (or updates) a
 Release PR from `github-actions[bot]`. CI runs on the Release PR are
 approved by the `approve-release-pr` job. Merging the Release PR tags
 the release (`vX.Y.Z`, force-created) and creates a draft GitHub
-release alongside it.
+release alongside it, which the `publish` job publishes automatically.
+Never publish a draft by hand.
