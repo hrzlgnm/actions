@@ -84,15 +84,38 @@ jobs:
               } catch (err) {
                 core.warning(`Failed to refresh PR #${prNumber}: ${err.message}`);
               }
-              const { data } = await github.rest.actions.listWorkflowRunsForRepo({
-                owner, repo, branch, event: 'pull_request', status: 'action_required', per_page: 100,
-              });
-              const pending = data.workflow_runs.filter(
+              const runs = await github.paginate(
+                github.rest.actions.listWorkflowRunsForRepo,
+                { owner, repo, branch, event: 'pull_request', status: 'action_required', per_page: 100 },
+                (response) => response.data.workflow_runs,
+              );
+              const pending = runs.filter(
                 (run) =>
                   run.triggering_actor?.login === 'github-actions[bot]' &&
                   run.pull_requests?.[0]?.number === prNumber,
               );
               const current = pending.filter((run) => run.head_sha === headSha);
+              try {
+                const { data: recheckedPr } = await github.rest.pulls.get({
+                  owner, repo, pull_number: prNumber,
+                });
+                if (recheckedPr.head.sha !== headSha) {
+                  headSha = recheckedPr.head.sha;
+                  approved = 0;
+                  core.info(`PR #${prNumber} head moved to ${headSha} during scan, discarding run snapshot`);
+                  const recheckedFiles = await github.paginate(github.rest.pulls.listFiles, {
+                    owner, repo, pull_number: prNumber, per_page: 100,
+                  });
+                  if (hasWorkflowChanges(recheckedFiles)) {
+                    core.warning(`Skipping: PR #${prNumber} has unverified or modified workflow files`);
+                    return;
+                  }
+                  continue;
+                }
+              } catch (err) {
+                core.warning(`Failed to revalidate PR #${prNumber} head: ${err.message}`);
+                continue;
+              }
               for (const run of pending) {
                 if (run.head_sha !== headSha) {
                   try {
