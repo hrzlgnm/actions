@@ -19,7 +19,7 @@ on:
         description: "Head branch of the github-actions[bot] PR whose workflow runs should be approved"
 
 permissions:
-  actions: write # needed to approve workflow runs
+  actions: write # needed to approve and delete workflow runs
   contents: read # needed to list workflow runs and PR files
   pull-requests: read # needed to look up PRs and their files
 
@@ -63,6 +63,7 @@ jobs:
             core.info(`Waiting for and approving latest workflow runs for PR #${prNumber} (head ${headSha})`);
             const deadline = Date.now() + 5 * 60 * 1000;
             let approved = 0;
+            let deleted = 0;
             while (Date.now() < deadline) {
               try {
                 const { data: freshPr } = await github.rest.pulls.get({
@@ -83,18 +84,47 @@ jobs:
               } catch (err) {
                 core.warning(`Failed to refresh PR #${prNumber}: ${err.message}`);
               }
-              const { data } = await github.rest.actions.listWorkflowRunsForRepo({
-                owner, repo, branch, event: 'pull_request', status: 'action_required', per_page: 100,
-              });
-              const pending = data.workflow_runs.filter(
+              const runs = await github.paginate(
+                github.rest.actions.listWorkflowRunsForRepo,
+                { owner, repo, branch, event: 'pull_request', status: 'action_required', per_page: 100 },
+                (response) => response.data.workflow_runs,
+              );
+              const pending = runs.filter(
                 (run) =>
                   run.triggering_actor?.login === 'github-actions[bot]' &&
                   run.pull_requests?.[0]?.number === prNumber,
               );
               const current = pending.filter((run) => run.head_sha === headSha);
+              try {
+                const { data: recheckedPr } = await github.rest.pulls.get({
+                  owner, repo, pull_number: prNumber,
+                });
+                if (recheckedPr.head.sha !== headSha) {
+                  headSha = recheckedPr.head.sha;
+                  approved = 0;
+                  core.info(`PR #${prNumber} head moved to ${headSha} during scan, discarding run snapshot`);
+                  const recheckedFiles = await github.paginate(github.rest.pulls.listFiles, {
+                    owner, repo, pull_number: prNumber, per_page: 100,
+                  });
+                  if (hasWorkflowChanges(recheckedFiles)) {
+                    core.warning(`Skipping: PR #${prNumber} has unverified or modified workflow files`);
+                    return;
+                  }
+                  continue;
+                }
+              } catch (err) {
+                core.warning(`Failed to revalidate PR #${prNumber} head: ${err.message}`);
+                continue;
+              }
               for (const run of pending) {
                 if (run.head_sha !== headSha) {
-                  core.info(`Skipping stale run ${run.id} (head ${run.head_sha}, latest ${headSha})`);
+                  try {
+                    await github.rest.actions.deleteWorkflowRun({ owner, repo, run_id: run.id });
+                    deleted++;
+                    core.info(`Deleted stale run ${run.id} (head ${run.head_sha}, latest ${headSha})`);
+                  } catch (err) {
+                    core.warning(`Failed to delete stale run ${run.id}: ${err.message}`);
+                  }
                 }
               }
               for (const run of current) {
@@ -112,4 +142,4 @@ jobs:
               }
               await new Promise((r) => setTimeout(r, 10000));
             }
-            core.info(`Approved ${approved} workflow run(s) for PR #${prNumber} (head ${headSha})`);
+            core.info(`Approved ${approved} workflow run(s) and deleted ${deleted} stale run(s) for PR #${prNumber} (head ${headSha})`);
