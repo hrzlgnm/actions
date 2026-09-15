@@ -15,6 +15,7 @@ Collection of reusable GitHub Actions workflows. Published for external consumpt
 - **Branch naming** — `feat/`, `fix/`, `chore/`, `docs/`, `refactor/`, `perf/`, `renovate/`, `deps/` trigger auto-labeling by `ci.yml`'s labeler step.
 - **No `--label` on PR create** — Labels are set automatically by the `label-pr` job in `ci.yml`. Do not pass `--label` to `gh pr create`.
 - **README documents every action** — Adding a shared action or reusable workflow requires a `README.md` section with a `Quick Start` example (plus an inputs table when it takes inputs). CI does not enforce this; reviewers must.
+- **Release-please JSON formatting** — `release-please-config.json` and `.release-please-manifest.json` must be canonical 2-space JSON with a trailing newline. Check with: `python3 -c 'import json,sys; sys.exit(any(open(f).read() != json.dumps(json.load(open(f)), indent=2) + "\n" for f in ["release-please-config.json", ".release-please-manifest.json"]))'`.
 
 ## Workflows
 
