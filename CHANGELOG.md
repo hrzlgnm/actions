@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.14.9](https://github.com/hrzlgnm/actions/compare/v2.14.8...v2.14.9) (2026-09-15)
+
+
+### Bug Fixes
+
+* drop persisted credentials from publish job checkout ([#270](https://github.com/hrzlgnm/actions/issues/270)) ([4031293](https://github.com/hrzlgnm/actions/commit/4031293f8f03241b3a192dc8b60561706c676187))
+
 ## [2.14.8](https://github.com/hrzlgnm/actions/compare/v2.14.7...v2.14.8) (2026-09-15)
 
 
