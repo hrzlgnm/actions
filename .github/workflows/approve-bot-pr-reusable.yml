@@ -84,6 +84,19 @@ jobs:
               } catch (err) {
                 core.warning(`Failed to refresh PR #${prNumber}: ${err.message}`);
               }
+              const allRuns = (await github.paginate(
+                github.rest.actions.listWorkflowRunsForRepo,
+                { owner, repo, branch, event: 'pull_request', per_page: 100 },
+                (response) => response.data.workflow_runs,
+              )) ?? [];
+              const headRuns = (Array.isArray(allRuns) ? allRuns : []).filter(
+                (run) => run?.head_sha === headSha,
+              );
+              if (headRuns.length === 0) {
+                core.info(`No workflow runs yet for head ${headSha}, waiting...`);
+                await new Promise((r) => setTimeout(r, 10000));
+                continue;
+              }
               const runs = (await github.paginate(
                 github.rest.actions.listWorkflowRunsForRepo,
                 { owner, repo, branch, event: 'pull_request', status: 'action_required', per_page: 100 },
@@ -140,24 +153,9 @@ jobs:
                 core.info(`No more pending runs for latest head ${headSha} after approving ${approved}, done`);
                 break;
               }
-              if (pending.length === 0 && current.length === 0) {
-                try {
-                  const allRuns = (await github.paginate(
-                    github.rest.actions.listWorkflowRunsForRepo,
-                    { owner, repo, branch, event: 'pull_request', per_page: 100 },
-                    (response) => response.data.workflow_runs,
-                  )) ?? [];
-                  const headRuns = (Array.isArray(allRuns) ? allRuns : []).filter(
-                    (run) => run?.head_sha === headSha,
-                  );
-                  if (headRuns.length > 0) {
-                    core.info(`No action_required runs for head ${headSha} (${headRuns.length} run(s) already queued, in progress, or completed), done`);
-                    break;
-                  }
-                  core.info(`No workflow runs yet for head ${headSha}, waiting...`);
-                } catch (err) {
-                  core.warning(`Failed to list runs for head ${headSha}: ${err.message}`);
-                }
+              if (pending.length === 0) {
+                core.info(`No action_required runs for head ${headSha}, done`);
+                break;
               }
               await new Promise((r) => setTimeout(r, 10000));
             }
