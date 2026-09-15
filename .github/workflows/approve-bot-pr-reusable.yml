@@ -64,6 +64,22 @@ jobs:
             const deadline = Date.now() + 5 * 60 * 1000;
             let approved = 0;
             let deleted = 0;
+            // NOTE: do not use github.paginate() with a map function for
+            // listWorkflowRunsForRepo here — it returned [undefined]-style
+            // results instead of the runs (crash in #260, blind polling in
+            // run 35010640361). Direct REST pages are deterministic.
+            const listBranchRuns = async (extra) => {
+              const out = [];
+              for (let page = 1; page <= 10; page++) {
+                const { data } = await github.rest.actions.listWorkflowRunsForRepo({
+                  owner, repo, branch, event: 'pull_request', per_page: 100, page, ...extra,
+                });
+                const batch = data.workflow_runs ?? [];
+                out.push(...batch);
+                if (batch.length < 100) break;
+              }
+              return out;
+            };
             while (Date.now() < deadline) {
               try {
                 const { data: freshPr } = await github.rest.pulls.get({
@@ -84,12 +100,15 @@ jobs:
               } catch (err) {
                 core.warning(`Failed to refresh PR #${prNumber}: ${err.message}`);
               }
-              const allRuns = (await github.paginate(
-                github.rest.actions.listWorkflowRunsForRepo,
-                { owner, repo, branch, event: 'pull_request', per_page: 100 },
-                (response) => response.data.workflow_runs,
-              )) ?? [];
-              const headRuns = (Array.isArray(allRuns) ? allRuns : []).filter(
+              let allRuns;
+              try {
+                allRuns = await listBranchRuns({});
+              } catch (err) {
+                core.warning(`Failed to list runs for head ${headSha}: ${err.message}`);
+                await new Promise((r) => setTimeout(r, 10000));
+                continue;
+              }
+              const headRuns = allRuns.filter(
                 (run) => run?.head_sha === headSha,
               );
               if (headRuns.length === 0) {
@@ -97,12 +116,8 @@ jobs:
                 await new Promise((r) => setTimeout(r, 10000));
                 continue;
               }
-              const runs = (await github.paginate(
-                github.rest.actions.listWorkflowRunsForRepo,
-                { owner, repo, branch, event: 'pull_request', status: 'action_required', per_page: 100 },
-                (response) => response.data.workflow_runs,
-              )) ?? [];
-              const pending = (Array.isArray(runs) ? runs : []).filter(
+              const runs = await listBranchRuns({ status: 'action_required' });
+              const pending = runs.filter(
                 (run) =>
                   run?.triggering_actor?.login === 'github-actions[bot]' &&
                   run?.pull_requests?.[0]?.number === prNumber,
