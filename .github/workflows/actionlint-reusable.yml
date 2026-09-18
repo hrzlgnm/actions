@@ -58,4 +58,19 @@ jobs:
 
       - name: 🔍 Validate workflows
         run: |
+          # TEMPORARY: actionlint 1.7.12 does not know the ubuntu-26.04 runner
+          # images yet and rejects the labels as unknown.
+          # https://github.com/rhysd/actionlint/issues/682
+          # Declare them as self-hosted labels so no per-repo actionlint.yaml
+          # is needed. Remove this block once actionlint knows the images.
+          if [ ! -f .github/actionlint.yaml ] && [ ! -f .github/actionlint.yml ]; then
+            printf '%s\n' \
+              '# TEMPORARY: actionlint 1.7.12 does not know ubuntu-26.04 yet.' \
+              '# https://github.com/rhysd/actionlint/issues/682' \
+              '# Remove this file once actionlint knows the images.' \
+              'self-hosted-runner:' \
+              '  labels:' \
+              '    - ubuntu-26.04' \
+              '    - ubuntu-26.04-arm' > .github/actionlint.yaml
+          fi
           actionlint .github/workflows/*.yml
