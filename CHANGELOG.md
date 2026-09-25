@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.14.10](https://github.com/hrzlgnm/actions/compare/v2.14.9...v2.14.10) (2026-09-25)
+
+
+### Dependencies
+
+* update crate-ci/typos action to v1.50.3 ([#273](https://github.com/hrzlgnm/actions/issues/273)) ([adf30df](https://github.com/hrzlgnm/actions/commit/adf30df5f0fad2580fc132efaeb8d573d45f87fa))
+
 ## [2.14.9](https://github.com/hrzlgnm/actions/compare/v2.14.8...v2.14.9) (2026-09-18)
 
 
