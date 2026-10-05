@@ -135,6 +135,30 @@ clone the AUR repo, verify the version) in one pinned step.
 | `release-version` | yes | — |
 | `deploy-key` | yes | — |
 
+An equal or higher `pkgver` in the AUR checkout means the release is
+already published, so the step succeeds and reports no update instead
+of failing. Gate the publish step on the output to stop normally:
+
+```yml
+    - name: Setup AUR packaging
+      id: setup
+      uses: hrzlgnm/actions/.github/actions/aur-setup@v2.12.0
+      with:
+        package-name: ${{ matrix.package.name }}
+        release-version: ${{ needs.release-info.outputs.version }}
+        deploy-key: ${{ secrets.AUR_DEPLOY_KEY }}
+
+    - name: Generate PKGBUILD update and publish
+      if: steps.setup.outputs.needs_update != 'false'
+      uses: hrzlgnm/actions/.github/actions/retry@v2.12.0
+      with:
+        command: su runner -c "./packaging/aur/publish-aur.sh"
+```
+
+| Output | Value |
+| --- | --- |
+| `needs_update` | `'true'` when the release is newer, `'false'` when already published or ahead |
+
 ### Lint generated PKGBUILD
 
 Runs `namcap` and `makepkg --verifysource` (retrying) for a generated
