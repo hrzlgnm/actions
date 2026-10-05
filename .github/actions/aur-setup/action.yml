@@ -21,6 +21,11 @@ inputs:
     description: SSH private key for the aur.archlinux.org service user
     required: true
 
+outputs:
+  needs_update:
+    description: Whether the AUR package needs an update ('true' when the release is newer, 'false' when already published or ahead)
+    value: ${{ steps.check-version.outputs.needs_update }}
+
 runs:
   using: composite
   steps:
@@ -67,10 +72,16 @@ runs:
         # HOME/SHELL/USER/LOGNAME, so the script reads inputs from env.
         command: su runner -c '"$ACTION_DIR/clone-aur-repo.sh"'
 
-    - shell: bash
+    - id: check-version
+      shell: bash
       env:
         ACTION_DIR: ${{ github.action_path }}
         RELEASE_VERSION: ${{ inputs.release-version }}
       # su without --login keeps the step env and only resets
       # HOME/SHELL/USER/LOGNAME, so the script reads inputs from env.
-      run: su runner -c '"$ACTION_DIR/check-aur-version.sh"'
+      # The check runs as runner (owner of ~/aur); the GITHUB_OUTPUT file
+      # may be root-owned in the container, so make it writable first while
+      # still root.
+      run: |
+        chmod a+w "${GITHUB_OUTPUT}"
+        su runner -c '"$ACTION_DIR/check-aur-version.sh"'
