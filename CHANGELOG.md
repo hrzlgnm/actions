@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.14.11](https://github.com/hrzlgnm/actions/compare/v2.14.10...v2.14.11) (2026-10-05)
+
+
+### Bug Fixes
+
+* **aur-setup:** stop normally when AUR is already published ([#275](https://github.com/hrzlgnm/actions/issues/275)) ([c6eba01](https://github.com/hrzlgnm/actions/commit/c6eba0183f95d2e5adedaad84afa30bf8220870b))
+
 ## [2.14.10](https://github.com/hrzlgnm/actions/compare/v2.14.9...v2.14.10) (2026-09-25)
 
 
