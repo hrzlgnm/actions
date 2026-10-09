@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.14.12](https://github.com/hrzlgnm/actions/compare/v2.14.11...v2.14.12) (2026-10-09)
+
+
+### Dependencies
+
+* update crate-ci/typos action to v1.51.1 ([#277](https://github.com/hrzlgnm/actions/issues/277)) ([09b8ac8](https://github.com/hrzlgnm/actions/commit/09b8ac8e632c40ee3e784e300d18fac837858462))
+
+
+### Miscellaneous Chores
+
+* use ubuntu-slim runner where safe ([#279](https://github.com/hrzlgnm/actions/issues/279)) ([7544510](https://github.com/hrzlgnm/actions/commit/7544510c8c82e71cbc6c0a4bf523339d8fbebf24))
+
 ## [2.14.11](https://github.com/hrzlgnm/actions/compare/v2.14.10...v2.14.11) (2026-10-05)
 
 
