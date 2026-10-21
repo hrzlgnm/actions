@@ -86,6 +86,21 @@ jobs:
       runs-on: ubuntu-latest
       scripts-dir: ${{ matrix.scripts-dir }}
 
+  shell-test:
+    needs: [actionlint]
+    runs-on: ubuntu-slim
+    permissions:
+      contents: read # Needed to checkout code for testing
+    steps:
+      - name: 🔄 Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: 🧪 Test setup-aur-ssh key filtering
+        run: bash .github/actions/aur-setup/test-setup-aur-ssh.sh
+
   all-required-green: # This job does nothing and is only used for the branch protection
     name: CI Status
     runs-on: ubuntu-slim
@@ -93,6 +108,7 @@ jobs:
       - label-pr
       - actionlint
       - shell-lint
+      - shell-test
       - typos
     if: always()
     steps:
