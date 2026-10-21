@@ -26,13 +26,15 @@ touch "$config"
 chmod 600 "$config"
 tmp_config=$(mktemp "${HOME}/.ssh/config.XXXXXX")
 scan_tmp=$(mktemp "${HOME}/.ssh/aur-known-hosts.XXXXXX")
+verified_keys=$(mktemp "${HOME}/.ssh/aur-verified-keys.XXXXXX")
 key_patterns=$(mktemp "${HOME}/.ssh/aur-key-patterns.XXXXXX")
 tmp_known_hosts=$(mktemp "${HOME}/.ssh/known-hosts.XXXXXX")
-trap 'rm -f "$tmp_config" "$scan_tmp" "$key_patterns" "$tmp_known_hosts"' EXIT
+trap 'rm -f "$tmp_config" "$scan_tmp" "$verified_keys" "$key_patterns" "$tmp_known_hosts"' EXIT
 awk '/^Host aur\.archlinux\.org([[:space:]]|$)/ { skip = 1; next } /^Host / { skip = 0 } !skip' "$config" >"$tmp_config"
 cat >>"$tmp_config" <<'EOF'
 Host aur.archlinux.org
   IdentityFile ~/.ssh/aur
+  UpdateHostKeys no
   User aur
 EOF
 mv "$tmp_config" "$config"
@@ -52,11 +54,18 @@ while read -r host type key; do
     case " $aur_ssh_fps " in
         *" $fp "*) ;;
         *)
-            echo "::error::AUR host key $type fingerprint $fp not in Arch-published set, refusing"
-            exit 1
+            # Server-side key types Arch has not published (e.g. a new
+            # ssh-mldsa44-ed25519 host key) are ignored, never recorded, so
+            # SSH only trusts pinned keys. Every recorded key below is
+            # pinned, so a MITM presenting only unknown keys still fails
+            # on the verified-count guard. Add the fingerprint above once
+            # Arch publishes it (aur.archlinux.org home page).
+            echo "::warning::AUR host key $type fingerprint $fp not in Arch-published set, ignoring"
+            continue
             ;;
     esac
     echo "Verified AUR host key $type $fp"
+    printf '%s %s %s\n' "$host" "$type" "$key" >>"$verified_keys"
     verified=$((verified + 1))
 done <"$scan_tmp"
 if [[ "$verified" -eq 0 ]]; then
@@ -68,7 +77,8 @@ ssh-keygen -R aur.archlinux.org -f "${HOME}/.ssh/known_hosts" >/dev/null 2>&1 ||
 # Drop previously recorded lines carrying the same key material. Key bodies
 # are stable across scans even though -H salts differ, so a retry keeps
 # exactly one copy of each key instead of accumulating stale hashed lines.
-awk '{print $3}' "$scan_tmp" >"$key_patterns"
+# Only verified (pinned) keys are recorded; ignored types never land here.
+awk '{print $3}' "$verified_keys" >"$key_patterns"
 grep -v -F -f "$key_patterns" "${HOME}/.ssh/known_hosts" >"$tmp_known_hosts" || true
 mv "$tmp_known_hosts" "${HOME}/.ssh/known_hosts"
-cat "$scan_tmp" >>"${HOME}/.ssh/known_hosts"
+cat "$verified_keys" >>"${HOME}/.ssh/known_hosts"
