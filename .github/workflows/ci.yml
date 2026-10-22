@@ -52,20 +52,6 @@ jobs:
         run: |
           echo "branch=${{ env.BRANCH_NAME }}" >> "$GITHUB_OUTPUT"
 
-  label-pr:
-    if: github.event_name == 'pull_request'
-    name: "🏷️ Label PR"
-    permissions:
-      contents: read # Needed to read repository contents
-      pull-requests: write # Needed to apply labels
-      issues: write # Needed to create non existing labels
-    runs-on: ubuntu-slim
-
-    steps:
-      - uses: actions/labeler@bf12e9b00b37c5c0ca2b87b79b2daf7891dbda13 # v7.0.0
-        with:
-          configuration-path: .github/labeler.yml
-
   typos:
     uses: ./.github/workflows/typos-reusable.yml
 
@@ -105,7 +91,6 @@ jobs:
     name: CI Status
     runs-on: ubuntu-slim
     needs:
-      - label-pr
       - actionlint
       - shell-lint
       - shell-test
@@ -116,6 +101,5 @@ jobs:
         uses: re-actors/alls-green@a638d6464689bbb24c325bb3fe9404d63a913030
         with:
           allowed-skips: >-
-            label-pr,
             docker
           jobs: ${{ toJSON(needs) }}
