@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.14.13](https://github.com/hrzlgnm/actions/compare/v2.14.12...v2.14.13) (2026-11-03)
+
+
+### Dependencies
+
+* update crate-ci/typos action to v1.52.0 ([#285](https://github.com/hrzlgnm/actions/issues/285)) ([e0d9c4c](https://github.com/hrzlgnm/actions/commit/e0d9c4c10250dfac10059def969e77c6308f36ed))
+* update docker/login-action action to v4.7.0 ([#284](https://github.com/hrzlgnm/actions/issues/284)) ([f6deb9d](https://github.com/hrzlgnm/actions/commit/f6deb9d928885ee51de0252c1985857515cbffc2))
+
+
+### Miscellaneous Chores
+
+* **ci:** only cancel in-progress runs off main ([#281](https://github.com/hrzlgnm/actions/issues/281)) ([a89867e](https://github.com/hrzlgnm/actions/commit/a89867e6396b8d4105502bed253926dfaf1b84f4))
+* **ci:** remove PR labeler ([#283](https://github.com/hrzlgnm/actions/issues/283)) ([a9bbf99](https://github.com/hrzlgnm/actions/commit/a9bbf992c78f37c14c9ef5babfb4d86fffe7d2b0))
+
 ## [2.14.12](https://github.com/hrzlgnm/actions/compare/v2.14.11...v2.14.12) (2026-10-21)
 
 
