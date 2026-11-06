@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.14.14](https://github.com/hrzlgnm/actions/compare/v2.14.13...v2.14.14) (2026-11-06)
+
+
+### Dependencies
+
+* update docker/login-action action to v4.8.0 ([#286](https://github.com/hrzlgnm/actions/issues/286)) ([25f0b50](https://github.com/hrzlgnm/actions/commit/25f0b50f3590e52cfe143bcf8057816d2b8b8ecf))
+
 ## [2.14.13](https://github.com/hrzlgnm/actions/compare/v2.14.12...v2.14.13) (2026-11-03)
 
 
