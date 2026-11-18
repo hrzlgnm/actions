@@ -1,0 +1,58 @@
+# Copyright 2026 hrzlgnm
+# SPDX-License-Identifier: MIT
+
+name: "Reusable SPDX license header check"
+
+on:
+  workflow_call:
+    inputs:
+      exclude:
+        description: >-
+          Glob patterns (one per line, git pathspec glob syntax) of tracked
+          files to skip, e.g. generated lockfiles.
+        type: string
+        required: false
+        default: ""
+      runs-on:
+        description: Runner label.
+        type: string
+        required: false
+        default: ubuntu-slim
+
+jobs:
+  spdx:
+    name: 📜
+    runs-on: ${{ inputs.runs-on }}
+    steps:
+      - name: 🔄 Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      # Every tracked source, workflow and config file that can hold a
+      # comment carries `SPDX-License-Identifier` in its first or last 5
+      # lines (header or footer; room for a shebang or a schema modeline).
+      # A mention mid-file does not count.
+      - name: 📜 Check SPDX headers
+        shell: bash
+        env:
+          EXCLUDE: ${{ inputs.exclude }}
+        run: |
+          specs=('*.rs' '*.ts' '*.tsx' '*.js' '*.mjs' '*.cjs' '*.yml' '*.yaml' '*.toml' '*.sh' '*.json5')
+          while IFS= read -r pattern; do
+            [ -n "$pattern" ] && specs+=(":(exclude,glob)$pattern")
+          done <<<"$EXCLUDE"
+          missing=()
+          while IFS= read -r -d '' f; do
+            # No pipe into `grep -q`: under pipefail its early exit
+            # would fail the pipeline via SIGPIPE in head/tail.
+            edges=$(head -n 5 -- "$f"; tail -n 5 -- "$f")
+            if ! grep -q 'SPDX-License-Identifier' <<<"$edges"; then
+              missing+=("$f")
+            fi
+          done < <(git ls-files -z -- "${specs[@]}")
+          if [ "${#missing[@]}" -gt 0 ]; then
+            echo "::error::Files without an SPDX-License-Identifier header or footer:"
+            printf '%s\n' "${missing[@]}"
+            exit 1
+          fi

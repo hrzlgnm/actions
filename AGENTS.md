@@ -24,6 +24,7 @@ Collection of reusable GitHub Actions workflows. Published for external consumpt
 | `ci.yml` | push/PR/schedule | Main CI: detect changes, label PRs, typos, actionlint, alls-green gate |
 | `release.yml` | push main | release-please: open/update Release PR, tag, create draft release |
 | `typos-reusable.yml` | workflow_call | Spell check with `crate-ci/typos` |
+| `spdx-reusable.yml` | workflow_call | Fail when a tracked source/config file lacks an SPDX header or footer |
 | `shell-lint-reusable.yml` | workflow_call | Install pinned shellcheck/shfmt and lint shell scripts |
 | `actionlint-reusable.yml` | workflow_call | Lint workflow files |
 | `docker-reusable.yml` | workflow_call | Build & push changed Dockerfiles to GHCR |
