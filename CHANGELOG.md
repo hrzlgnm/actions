@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.15.0](https://github.com/hrzlgnm/actions/compare/v2.14.13...v2.15.0) (2026-11-18)
+
+
+### Features
+
+* add a reusable SPDX license header check ([#291](https://github.com/hrzlgnm/actions/issues/291)) ([a49a8be](https://github.com/hrzlgnm/actions/commit/a49a8bef57fcf1671e84064e8775dca579663e17))
+
+
+### Dependencies
+
+* update crate-ci/typos action to v1.52.1 ([#288](https://github.com/hrzlgnm/actions/issues/288)) ([c85399f](https://github.com/hrzlgnm/actions/commit/c85399f92d5112f1e55ce08ef816746a3637a12c))
+* update crate-ci/typos action to v1.52.2 ([#289](https://github.com/hrzlgnm/actions/issues/289)) ([e218ad5](https://github.com/hrzlgnm/actions/commit/e218ad5aeae94812bd2d171242ac887f56d76905))
+* update docker/login-action action to v4.8.0 ([#286](https://github.com/hrzlgnm/actions/issues/286)) ([25f0b50](https://github.com/hrzlgnm/actions/commit/25f0b50f3590e52cfe143bcf8057816d2b8b8ecf))
+
+
+### Miscellaneous Chores
+
+* add missing SPDX license headers ([#290](https://github.com/hrzlgnm/actions/issues/290)) ([1e95fc3](https://github.com/hrzlgnm/actions/commit/1e95fc36820b88e94b6ac39fb1829a5399407cb6))
+
 ## [2.14.13](https://github.com/hrzlgnm/actions/compare/v2.14.12...v2.14.13) (2026-11-03)
 
 
