@@ -55,6 +55,9 @@ jobs:
   typos:
     uses: ./.github/workflows/typos-reusable.yml
 
+  spdx:
+    uses: ./.github/workflows/spdx-reusable.yml
+
   actionlint:
     uses: ./.github/workflows/actionlint-reusable.yml
 
@@ -95,6 +98,7 @@ jobs:
       - shell-lint
       - shell-test
       - typos
+      - spdx
     if: always()
     steps:
       - name: Check whether the needed jobs succeeded or failed
